@@ -10,8 +10,17 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             "id",
-            "email",
             "username",
+            "email",
+            "first_name",
+            "last_name",
+            "file",
+            "location",
+            "tel",
+            "description",
+            "working_hours",
+            "type",
+            "created_at",
         ]
 
 class RegistrationSerializer(serializers.ModelSerializer):

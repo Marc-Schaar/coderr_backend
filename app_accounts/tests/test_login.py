@@ -5,16 +5,9 @@ from rest_framework.test import APIClient, APITestCase
 
 from app_accounts.models import User
 
-class TestRegistration(APITestCase):
+class TestLogin(APITestCase):
     def setUp(self):
         self.user = User.objects.create_user(username="exampleUsername", password="examplePassword")
-        # self.token_user = Token.objects.create(user=self.user)
-      
-        # self.user_client = APIClient()
-        # self.user_client.credentials(HTTP_AUTHORIZATION="Token " + self.token_user.key)
-
-    
-      
 
     def test_login_user(self):
         url = reverse("login-list")
