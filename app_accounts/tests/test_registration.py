@@ -4,7 +4,7 @@ from rest_framework.test import APIClient, APITestCase
 
 class TestRegistration(APITestCase):
     def setUp(self):
-        self.client = APIClient()
+        self.user_client = APIClient()
         self.url = reverse("registration-list")
         self.data = {
             "username": "user_test",
@@ -15,7 +15,7 @@ class TestRegistration(APITestCase):
         }
 
     def test_register_user_success(self):
-        response = self.client.post(self.url, self.data, format="json")
+        response = self.user_client.post(self.url, self.data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         response_data = response.json()
         self.assertIn("token", response_data)
@@ -24,8 +24,8 @@ class TestRegistration(APITestCase):
         self.assertEqual(response_data["user_id"], 1)
 
     def test_register_user_exist(self):
-        self.client.post(self.url, self.data, format="json")
-        response = self.client.post(self.url, self.data, format="json")
+        self.user_client.post(self.url, self.data, format="json")
+        response = self.user_client.post(self.url, self.data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.json()["error"], "Ungültige Anfragedaten.")
         
@@ -38,7 +38,7 @@ class TestRegistration(APITestCase):
         ]
         for data in invalid_data_list:
             with self.subTest(data=data):
-                response = self.client.post(self.url, data, format="json")
+                response = self.user_client.post(self.url, data, format="json")
                 self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
                 self.assertIn("error", response.json())
                 self.assertEqual(response.json()["error"], "Ungültige Anfragedaten.")

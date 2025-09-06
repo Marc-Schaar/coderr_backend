@@ -14,7 +14,6 @@ class UserSerializer(serializers.ModelSerializer):
             "username",
         ]
 
-
 class RegistrationSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)
     email = serializers.EmailField(required=True) 
@@ -22,9 +21,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
     repeated_password = serializers.CharField(write_only=True) 
     type = serializers.CharField(required=True)
    
-   
-  
-
     class Meta:
         model = User
         fields = ["username", "email", "password", "repeated_password", "type"]
@@ -34,7 +30,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
             if data["password"] != data["repeated_password"]:
-                raise serializers.ValidationError("Passwords do not match")
+                raise serializers.ValidationError("Passwort stimmt nicht überein")
             return data
     
     def validate_username(self, value):
