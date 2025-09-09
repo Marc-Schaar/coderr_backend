@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from app_accounts.models import User
+from app_accounts.models import User, Profile
 
 class UserSerializer(serializers.ModelSerializer):
     """
@@ -12,6 +12,22 @@ class UserSerializer(serializers.ModelSerializer):
             "id",
             "username",
             "email",
+            "type",
+        ]
+
+class ProfileSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source="user.username", read_only=True)
+    first_name = serializers.CharField(source="user.first_name", required=False, allow_blank=True)
+    last_name = serializers.CharField(source="user.last_name", required=False, allow_blank=True)
+    email = serializers.EmailField(source="user.email", required=False)
+    type = serializers.CharField(source="user.type", read_only=True)
+    
+
+    class Meta:
+        model = Profile
+        fields = [
+            "user",
+            "username",
             "first_name",
             "last_name",
             "file",
@@ -20,8 +36,37 @@ class UserSerializer(serializers.ModelSerializer):
             "description",
             "working_hours",
             "type",
+            "email",
             "created_at",
         ]
+    
+
+    def update(self, instance, validated_data):
+        user_data = {}
+        if "user" in validated_data:
+            user_data = validated_data.pop("user")
+
+        if "first_name" in validated_data:
+            instance.user.first_name = validated_data.pop("first_name")
+        if "last_name" in validated_data:
+            instance.user.last_name = validated_data.pop("last_name")
+        if "email" in validated_data:
+            instance.user.email = validated_data.pop("email")
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        if user_data:
+            for attr, value in user_data.items():
+                setattr(instance.user, attr, value)
+        instance.user.save()
+
+        return instance
+
+       
+
+   
 
 class RegistrationSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)

@@ -4,11 +4,12 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, APITestCase
 
 from app_accounts.models import User
+from app_accounts.api.serializers import ProfileSerializer
 
 class TestProfiles(APITestCase):
     def setUp(self):
         self.user_1 = User.objects.create_user(username="max_mustermann", password="examplePassword", email="test@test.de", type="business")
-        self.user_2 = User.objects.create_user(username="exampleUsername_2", password="examplePassword")
+        self.user_2 = User.objects.create_user(username="exampleUsername_2", email="email2est,de", type="business", password="examplePassword")
 
         self.token_user_1 = Token.objects.create(user=self.user_1)
         self.token_user_2 = Token.objects.create(user=self.user_2)
@@ -19,26 +20,87 @@ class TestProfiles(APITestCase):
         self.user_client_2 = APIClient()
         self.user_client_2.credentials(HTTP_AUTHORIZATION="Token " + self.token_user_2.key)
 
-    def test_profiles_get(self):
+    def test_profiles_get_200(self):
         url = reverse("profile-detail", kwargs={"pk": 1})
         response = self.user_client_1.get(url, format="json")
-        expected_data = {
-            "id": 1,
-            "username": "max_mustermann",
-            "first_name": "",
-            "last_name": "",
-            "file": None,
-            "location": "",   
-            "tel": "",
-            "description": "",
-            "working_hours": "",
-            "type": "business",
-            "email": "test@test.de",
-            "created_at": response.data["created_at"],
-        }
+        expected_data = ProfileSerializer(self.user_1.profile).data
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, expected_data)
+        self.assertJSONEqual(response.content, expected_data)
+
+    def test_profile_detail_get_without_auth_401(self):
+        url = reverse("profile-detail", kwargs={"pk": self.user_1.pk})
+        self.user_client_1.logout()
+
+        response = self.user_client_1.get(url, format="json")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_profile_detail_get_404_not_found(self):
+        url = reverse("profile-detail", kwargs={"pk": 999999})
+        response = self.user_client_1.get(url, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_profile_detail_patch_200(self):
+        url = reverse("profile-detail", kwargs={"pk": 1})
+        payload = {
+            "first_name": "Max",
+            "last_name": "Mustermann",
+            "location": "Berlin",
+            "tel": "987654321",
+            "description": "Updated business description",
+            "working_hours": "10-18",
+            "email": "new_email@business.de"
+        }
+
+        response = self.user_client_1.patch(url, payload, format="json")
+        self.user_1.refresh_from_db()   
+        self.user_1.profile.refresh_from_db() 
+        expected_data = ProfileSerializer(self.user_1.profile).data
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertJSONEqual(response.content, expected_data)
+        self.assertEqual(self.user_1.profile.location, "Berlin")
+        self.assertEqual(self.user_1.profile.tel, "987654321")
+        self.assertEqual(self.user_1.profile.description, "Updated business description")
+        self.assertEqual(self.user_1.profile.working_hours, "10-18")
+        self.assertEqual(self.user_1.first_name, "Max")
+        self.assertEqual(self.user_1.last_name, "Mustermann")
+        self.assertEqual(self.user_1.email, "new_email@business.de")
+
+    def test_profile_detail_patch_401(self):
+        url = reverse("profile-detail", kwargs={"pk": 1})
+        payload = {
+            "first_name": "Max",
+        }
+        self.user_client_1.logout()
+        response = self.user_client_1.patch(url, payload, format="json")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+    
+    def test_profile_detail_patch_404(self):
+        url = reverse("profile-detail", kwargs={"pk": 999999})
+        payload = {
+            "first_name": "Max",
+        }
+        response = self.user_client_1.patch(url, payload, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+    
+    def test_profile_detail_patch_403(self):
+        url = reverse("profile-detail", kwargs={"pk": 1})
+        payload = {
+            "first_name": "Max",
+        }
+        response = self.user_client_2.patch(url, payload, format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+    
+
+
+
+
+
+
+
+
+
       
 
        

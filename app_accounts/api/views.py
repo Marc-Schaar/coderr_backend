@@ -8,14 +8,16 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from app_accounts.models import User
-from .serializers import RegistrationSerializer, UserSerializer
+from app_accounts.models import User,Profile
+from .serializers import RegistrationSerializer, UserSerializer, ProfileSerializer
+from .permissions import IsOwnerOrReadOnly
 
 
 class ProfileDetailView(generics.RetrieveUpdateAPIView):
-    queryset= User.objects.all()
-    serializer_class = UserSerializer
+    queryset= Profile.objects.all()
+    serializer_class = ProfileSerializer
     lookup_field = "pk"
+    permission_classes = [IsOwnerOrReadOnly]
 
 class LoginView(ObtainAuthToken):
     permission_classes = [AllowAny]
@@ -48,7 +50,6 @@ class LoginView(ObtainAuthToken):
             return Response(
                 {"error": "Ungültige Anfragedaten."}, status=status.HTTP_400_BAD_REQUEST
             )
-
 
 class RegesistrationView(APIView):
     """
