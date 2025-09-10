@@ -15,6 +15,11 @@ class UserSerializer(serializers.ModelSerializer):
             "type",
         ]
 
+class UserListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("first_name", "last_name","username")
+
 class ProfileListSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source="user.username", read_only=True)
     first_name = serializers.CharField(source="user.first_name", required=False, allow_blank=True)

@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'app_accounts',
+    'app_offers',
+    'app_orders',
 ]
 
 MIDDLEWARE = [
@@ -135,4 +137,5 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+
 }

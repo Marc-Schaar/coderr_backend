@@ -111,13 +111,12 @@ class TestProfiles(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 # Uploadet_at muss noch getestet werden sobald der Fileupload geht
-    def test_profile_get_customer_list_200(self):
+    def test_profile_get_customer_list_200(self):   
         url = reverse("profile-customer-list",)
         response = self.user_client_1.get(url, format="json")
         expected_data = ProfileListSerializer(
             Profile.objects.filter(user__type="customer"), many=True
         ).data
-        print(response.json())
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertListEqual(response.json(), expected_data)
 
