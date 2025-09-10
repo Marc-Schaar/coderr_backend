@@ -15,7 +15,28 @@ class UserSerializer(serializers.ModelSerializer):
             "type",
         ]
 
-class ProfileSerializer(serializers.ModelSerializer):
+class ProfileListSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source="user.username", read_only=True)
+    first_name = serializers.CharField(source="user.first_name", required=False, allow_blank=True)
+    last_name = serializers.CharField(source="user.last_name", required=False, allow_blank=True)
+    type = serializers.CharField(source="user.type", read_only=True)
+    uploaded_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
+    # Uploadet_at muss noch getestet werden sobald der Fileupload geht
+
+
+    class Meta:
+        model = Profile
+        fields = [
+            "user",
+            "username",
+            "first_name",
+            "last_name",
+            "file",
+            "uploaded_at",
+            "type", 
+        ]
+
+class ProfileDetailSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source="user.username", read_only=True)
     first_name = serializers.CharField(source="user.first_name", required=False, allow_blank=True)
     last_name = serializers.CharField(source="user.last_name", required=False, allow_blank=True)
@@ -63,10 +84,6 @@ class ProfileSerializer(serializers.ModelSerializer):
         instance.user.save()
 
         return instance
-
-       
-
-   
 
 class RegistrationSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)

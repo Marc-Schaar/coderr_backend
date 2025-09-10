@@ -3,13 +3,13 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, APITestCase
 
-from app_accounts.models import User
-from app_accounts.api.serializers import ProfileSerializer
+from app_accounts.models import User,Profile
+from app_accounts.api.serializers import ProfileDetailSerializer, ProfileListSerializer
 
 class TestProfiles(APITestCase):
     def setUp(self):
         self.user_1 = User.objects.create_user(username="max_mustermann", password="examplePassword", email="test@test.de", type="business")
-        self.user_2 = User.objects.create_user(username="exampleUsername_2", email="email2est,de", type="business", password="examplePassword")
+        self.user_2 = User.objects.create_user(username="exampleUsername_2",  password="examplePassword", email="email2est,de", type="customer")
 
         self.token_user_1 = Token.objects.create(user=self.user_1)
         self.token_user_2 = Token.objects.create(user=self.user_2)
@@ -23,19 +23,19 @@ class TestProfiles(APITestCase):
     def test_profiles_get_200(self):
         url = reverse("profile-detail", kwargs={"pk": 1})
         response = self.user_client_1.get(url, format="json")
-        expected_data = ProfileSerializer(self.user_1.profile).data
+        expected_data = ProfileDetailSerializer(self.user_1.profile).data
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(response.content, expected_data)
 
-    def test_profile_detail_get_without_auth_401(self):
+    def test_profile_detail_get_401(self):
         url = reverse("profile-detail", kwargs={"pk": self.user_1.pk})
         self.user_client_1.logout()
 
         response = self.user_client_1.get(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_profile_detail_get_404_not_found(self):
+    def test_profile_detail_get_404_(self):
         url = reverse("profile-detail", kwargs={"pk": 999999})
         response = self.user_client_1.get(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -55,7 +55,7 @@ class TestProfiles(APITestCase):
         response = self.user_client_1.patch(url, payload, format="json")
         self.user_1.refresh_from_db()   
         self.user_1.profile.refresh_from_db() 
-        expected_data = ProfileSerializer(self.user_1.profile).data
+        expected_data = ProfileDetailSerializer(self.user_1.profile).data
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(response.content, expected_data)
@@ -76,14 +76,6 @@ class TestProfiles(APITestCase):
         response = self.user_client_1.patch(url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
     
-    def test_profile_detail_patch_404(self):
-        url = reverse("profile-detail", kwargs={"pk": 999999})
-        payload = {
-            "first_name": "Max",
-        }
-        response = self.user_client_1.patch(url, payload, format="json")
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-    
     def test_profile_detail_patch_403(self):
         url = reverse("profile-detail", kwargs={"pk": 1})
         payload = {
@@ -92,7 +84,48 @@ class TestProfiles(APITestCase):
         response = self.user_client_2.patch(url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
     
+    def test_profile_detail_patch_404(self):
+        url = reverse("profile-detail", kwargs={"pk": 999999})
+        payload = {
+            "first_name": "Max",
+        }
+        response = self.user_client_1.patch(url, payload, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+ 
+ # Uploadet_at muss noch getestet werden sobald der Fileupload geht
 
+    def test_profile_get_business_list_200(self):
+        url = reverse("profile-business-list",)
+        response = self.user_client_1.get(url, format="json")
+        expected_data = ProfileListSerializer(
+            Profile.objects.filter(user__type="business"), many=True
+        ).data
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertListEqual(response.json(), expected_data)
+
+    def test_profile_get_business_list_401(self):
+        url= reverse("profile-business-list")
+        self.user_client_1.logout()
+        response = self.user_client_1.get(url, format="json")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+# Uploadet_at muss noch getestet werden sobald der Fileupload geht
+    def test_profile_get_customer_list_200(self):
+        url = reverse("profile-customer-list",)
+        response = self.user_client_1.get(url, format="json")
+        expected_data = ProfileListSerializer(
+            Profile.objects.filter(user__type="customer"), many=True
+        ).data
+        print(response.json())
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertListEqual(response.json(), expected_data)
+
+    def test_profile_get_business_list_401(self):
+        url= reverse("profile-customer-list")
+        self.user_client_1.logout()
+        response = self.user_client_1.get(url, format="json")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 

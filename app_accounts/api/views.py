@@ -9,15 +9,23 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from app_accounts.models import User,Profile
-from .serializers import RegistrationSerializer, UserSerializer, ProfileSerializer
+from .serializers import RegistrationSerializer, UserSerializer, ProfileDetailSerializer, ProfileListSerializer
 from .permissions import IsOwnerOrReadOnly
 
 
 class ProfileDetailView(generics.RetrieveUpdateAPIView):
     queryset= Profile.objects.all()
-    serializer_class = ProfileSerializer
+    serializer_class = ProfileDetailSerializer
     lookup_field = "pk"
     permission_classes = [IsOwnerOrReadOnly]
+
+class ProfileBusinessListView(generics.ListAPIView):
+    queryset= Profile.objects.filter(user__type="business")
+    serializer_class = ProfileListSerializer
+
+class ProfileCustomerListView(generics.ListAPIView):
+    queryset= Profile.objects.filter(user__type="customer")
+    serializer_class = ProfileListSerializer
 
 class LoginView(ObtainAuthToken):
     permission_classes = [AllowAny]
