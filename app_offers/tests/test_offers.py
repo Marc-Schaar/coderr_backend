@@ -27,7 +27,7 @@ class TestProfiles(APITestCase):
             user=self.user_1,
             title="Website Design",
             description="Professionelles Website-Design...",
-            min_price=100,
+            min_price=1000,
             min_delivery_time=7,
         )
 
@@ -35,14 +35,14 @@ class TestProfiles(APITestCase):
             user=self.user_1,
             title="Website Design 2",
             description="Professionelles Website-Design...",
-            min_price=1000,
+            min_price=100,
             min_delivery_time=70,
         )
 
         self.offer_3 = Offer.objects.create(
             user=self.user_1,
             title="Website Design 3",
-            description="Professionelles Website-Design...",
+            description="Professionelles Website-Design für den Test search...",
             min_price=10000,
             min_delivery_time=700,
         )
@@ -118,6 +118,7 @@ class Test_Offer_List(TestProfiles):
     def test_offer_list_filter_by_max_delivery_time_200(self):
         url = reverse("offer-list") + f"?max_delivery_time=7"
         response = self.user_client_1.get(url)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         expected_dict = {
@@ -130,10 +131,59 @@ class Test_Offer_List(TestProfiles):
 
         url = reverse("offer-list") + f"?max_delivery_time=70"
         response = self.user_client_1.get(url)
+
         expected_dict = {
             "count": 2,
             "next": None,
             "previous": None,
             "results": OfferSerializer([self.offer_1, self.offer_2], many=True).data
+        }
+        self.assertDictEqual(response.json(), expected_dict)
+
+    def test_offer_list_ordering_min_price(self):
+        url = reverse("offer-list") + f"?ordering=min_price"
+        response = self.user_client_1.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        expected_dict = {
+            "count": 3,
+            "next": None,
+            "previous": None,
+            "results": OfferSerializer([self.offer_2, self.offer_1, self.offer_3], many=True).data
+        }
+        self.assertDictEqual(response.json(), expected_dict)
+
+    def test_offer_list_ordering_updated_at(self):
+        url = reverse("offer-list") + f"?ordering=updated_at"
+        response = self.user_client_1.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        expected_dict = {
+            "count": 3,
+            "next": None,
+            "previous": None,
+            "results": OfferSerializer([self.offer_1, self.offer_2, self.offer_3], many=True).data
+        }
+        self.assertDictEqual(response.json(), expected_dict)
+
+    def test_offer_list_search_title(self):
+        url = reverse("offer-list") + f"?search=Design 3"
+        response = self.user_client_1.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        expected_dict = {
+            "count": 1,
+            "next": None,
+            "previous": None,
+            "results": [OfferSerializer(self.offer_3).data]
+        }
+        self.assertDictEqual(response.json(), expected_dict)
+
+    def test_offer_list_search_description(self):
+        url = reverse("offer-list") + f"?search=Test"
+        response = self.user_client_1.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        expected_dict = {
+            "count": 1,
+            "next": None,
+            "previous": None,
+            "results": [OfferSerializer(self.offer_3).data]
         }
         self.assertDictEqual(response.json(), expected_dict)
