@@ -114,3 +114,26 @@ class Test_Offer_List(TestProfiles):
             "results": OfferSerializer([self.offer_1, self.offer_2, self.offer_3], many=True).data
         }
         self.assertDictEqual(response.json(), expected_dict)
+
+    def test_offer_list_filter_by_max_delivery_time_200(self):
+        url = reverse("offer-list") + f"?max_delivery_time=7"
+        response = self.user_client_1.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        expected_dict = {
+            "count": 1,
+            "next": None,
+            "previous": None,
+            "results": [OfferSerializer(self.offer_1).data]
+        }
+        self.assertDictEqual(response.json(), expected_dict)
+
+        url = reverse("offer-list") + f"?max_delivery_time=70"
+        response = self.user_client_1.get(url)
+        expected_dict = {
+            "count": 2,
+            "next": None,
+            "previous": None,
+            "results": OfferSerializer([self.offer_1, self.offer_2], many=True).data
+        }
+        self.assertDictEqual(response.json(), expected_dict)
