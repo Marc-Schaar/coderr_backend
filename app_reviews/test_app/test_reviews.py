@@ -205,3 +205,23 @@ class TestReviews(TestProfiles):
             for r in response_data
         ]
         self.assertEqual(cleaned_response, expected_data)
+
+    def test_offer_post_201(self):
+        url = reverse('reviews-list')
+        payload = {
+            "business_user": self.user_2.id,
+            "rating": 4,
+            "description": "Alles war toll!"
+        }
+
+        response = self.user_client_3.post(url, payload)
+        response_data = response.json()
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response_data['id'], 3)
+        self.assertEqual(response_data['business_user'], 2)
+        self.assertEqual(response_data['reviewer'], 3)
+        self.assertEqual(response_data['rating'], 4)
+        self.assertEqual(response_data['description'], "Alles war toll!")
+        self.assertIn('created_at', response_data)
+        self.assertIn('updated_at', response_data)
