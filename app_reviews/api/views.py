@@ -1,4 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.exceptions import ValidationError
 from rest_framework import generics, filters
 from app_reviews.models import Review
 
@@ -14,12 +15,5 @@ class ReviewListView(generics.ListCreateAPIView):
     ordering_fields = ['updated_at', 'rating']
 
     def perform_create(self, serializer):
-        serializer.save(reviewer=self.request.user)
-
-        # business_user = serializer.validated_data['business_user']
-        # reviewer = self.request.user
-
-        # if Review.objects.filter(business_user=business_user, reviewer=reviewer).exists():
-        #     raise ValidationError("Du hast diesen Business-User bereits bewertet!")
-
-        # serializer.save(reviewer=reviewer)
+        reviewer = self.request.user
+        serializer.save(reviewer=reviewer)
