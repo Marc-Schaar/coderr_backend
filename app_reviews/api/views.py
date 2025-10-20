@@ -1,13 +1,13 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, filters
-from app_offers.models import Offer
+from app_reviews.models import Review
 
 from .serializers import ReviewSerializer
 from .filters import ReviewFilter
 
 
-class ReviewListView(generics.ListAPIView):
-    queryset = Offer.objects.all()
+class ReviewListView(generics.ListCreateAPIView):
+    queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = ReviewFilter
