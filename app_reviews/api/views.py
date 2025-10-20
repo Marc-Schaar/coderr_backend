@@ -15,3 +15,11 @@ class ReviewListView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(reviewer=self.request.user)
+
+        # business_user = serializer.validated_data['business_user']
+        # reviewer = self.request.user
+
+        # if Review.objects.filter(business_user=business_user, reviewer=reviewer).exists():
+        #     raise ValidationError("Du hast diesen Business-User bereits bewertet!")
+
+        # serializer.save(reviewer=reviewer)

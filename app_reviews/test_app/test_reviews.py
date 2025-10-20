@@ -225,3 +225,24 @@ class TestReviews(TestProfiles):
         self.assertEqual(response_data['description'], "Alles war toll!")
         self.assertIn('created_at', response_data)
         self.assertIn('updated_at', response_data)
+
+    def test_offer_post_missing_fields_400(self):
+        url = reverse('reviews-list')
+        missing_field_payloads = [
+            {"rating": 4, "description": "Alles war toll!"},
+            {"business_user": self.user_2.id, "description": "Alles war toll!"},
+            {"business_user": self.user_5.id, "rating": 4},
+        ]
+
+        for p in missing_field_payloads:
+            response = self.user_client_3.post(url, p, format='json')
+            print(response.json())
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    # def test_offer_post_duplicate_400(self):
+    #     url = reverse('reviews-list')
+    #     payload = {"business_user": self.user_2.id, "rating": 2, "description": "Nicht toll!"}
+    #     self.user_client_3.post(url, payload, format='json')
+    #     response = self.user_client_3.post(url, payload, format='json')
+
+    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
