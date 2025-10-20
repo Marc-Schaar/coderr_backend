@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.sqlite3
+*.log
+
+# Virtual Environment
+venv/
+.env/
+.venv/
+
+# Django
+db.sqlite3
+/static/
+media/
+*.pot
+*.mo
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# PyCharm
+.idea/
+
+# Migrations (optional, wenn du sie nicht versionieren willst)
+# */migrations/
+# !*/migrations/__init__.py
+
+# pytest / coverage
+htmlcov/
+.coverage
+*.cover
+.pytest_cache/
+
+# Docker / Build
+__build__/
+dist/
+*.egg-info/
+
+# Environment variables
+*.env

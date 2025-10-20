@@ -1,0 +1,11 @@
+import django_filters
+from app_reviews.models import Review
+
+
+class ReviewFilter(django_filters.FilterSet):
+    business_user_id = django_filters.NumberFilter(field_name="reviewer_id")
+    reviewer_id = django_filters.NumberFilter(field_name="reviewer_id")
+
+    class Meta:
+        model = Review
+        fields = []
