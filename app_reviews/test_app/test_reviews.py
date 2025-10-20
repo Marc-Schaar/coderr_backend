@@ -97,6 +97,13 @@ class TestReviews(TestProfiles):
             self.assertIn('created_at', r)
             self.assertIn('updated_at', r)
 
+    def test_offer_list_401(self):
+        url = reverse("reviews-list")
+        self.user_client_1.logout()
+
+        response = self.user_client_1.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
     def test_offer_list_filtered_by_business_user_id(self):
         url = reverse("reviews-list") + f"?business_user_id={self.user_2.id}"
         response = self.user_client_1.get(url)
