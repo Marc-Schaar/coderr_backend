@@ -63,7 +63,7 @@ class TestProfiles(APITestCase):
 class TestReviews(TestProfiles):
     maxDiff = None
 
-    def test_offer_list(self):
+    def test_review_list(self):
         url = reverse("reviews-list")
         response = self.user_client_1.get(url)
         response_data = response.json()
@@ -110,7 +110,7 @@ class TestReviews(TestProfiles):
         response = self.user_client_1.get(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_offer_list_filtered_by_business_user_id(self):
+    def test_review_list_filtered_by_business_user_id(self):
         url = reverse("reviews-list") + f"?business_user_id={self.user_2.id}"
         response = self.user_client_1.get(url)
         response_data = response.json()
@@ -139,7 +139,7 @@ class TestReviews(TestProfiles):
         ]
         self.assertEqual(cleaned_response, expected_data)
 
-    def test_offer_list_filtered_by_reviewer_id(self):
+    def test_review_list_filtered_by_reviewer_id(self):
         url = reverse("reviews-list") + f"?reviewer_id={self.user_3.id}"
         response = self.user_client_1.get(url)
         response_data = response.json()
@@ -175,7 +175,7 @@ class TestReviews(TestProfiles):
         ]
         self.assertEqual(cleaned_response, expected_data)
 
-    def test_offer_list_ordered_by_reviewer_id(self):
+    def test_review_list_ordered_by_reviewer_id(self):
         url = reverse("reviews-list") + f"?ordering={'-rating'}"
         response = self.user_client_1.get(url)
         response_data = response.json()
@@ -212,7 +212,7 @@ class TestReviews(TestProfiles):
         ]
         self.assertEqual(cleaned_response, expected_data)
 
-    def test_offer_post_201(self):
+    def test_review_post_201(self):
         url = reverse('reviews-list')
         payload = {
             "business_user": self.user_6.id,
@@ -232,7 +232,7 @@ class TestReviews(TestProfiles):
         self.assertIn('created_at', response_data)
         self.assertIn('updated_at', response_data)
 
-    def test_offer_post_missing_fields_400(self):
+    def test_review_post_missing_fields_400(self):
         url = reverse('reviews-list')
         missing_field_payloads = [
             {"rating": 4, "description": "Alles war toll!"},
@@ -244,23 +244,38 @@ class TestReviews(TestProfiles):
             response = self.user_client_3.post(url, p, format='json')
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_offer_post_duplicate_400(self):
+    def test_review_post_duplicate_400(self):
         url = reverse('reviews-list')
         payload = {"business_user": self.user_2.id, "rating": 2, "description": "Nicht toll!"}
         self.user_client_3.post(url, payload, format='json')
         response = self.user_client_3.post(url, payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_offer_post_401(self):
+    def test_review_post_401(self):
         url = reverse('reviews-list')
         payload = {"business_user": self.user_2.id, "rating": 2, "description": "Nicht toll!"}
         self.user_client_3.logout()
         response = self.user_client_3.post(url, payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_offer_post_403(self):
+    def test_review_post_403(self):
         url = reverse('reviews-list')
         payload = {"business_user": self.user_2.id, "rating": 2, "description": "Nicht toll!"}
         response = self.user_client_6.post(url, payload, format='json')
         print(response.json())
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_review_patch_200(self):
+        url = reverse('reviews-detail', kwargs={"pk": self.review_1.id})
+        payloads = [
+            {"rating": 1},
+            {"description": "Sehr  unprofessioneller Service."},
+        ]
+        for payload in payloads:
+            response = self.user_client_1.patch(url, payload, format='json')
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+            self.review_1.refresh_from_db()
+
+            for key, value in payload.items():
+                self.assertEqual(getattr(self.review_1, key), value)
