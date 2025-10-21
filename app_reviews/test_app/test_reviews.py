@@ -39,6 +39,12 @@ class TestProfiles(APITestCase):
         self.user_client_5 = APIClient()
         self.user_client_5.credentials(HTTP_AUTHORIZATION="Token " + self.token_user_5.key)
 
+        self.user_6 = User.objects.create_user(
+            username="user6", password="examplePassword", email="test6@test.de", type="business", first_name="Marc", last_name="Schaar")
+        self.token_user_6 = Token.objects.create(user=self.user_6)
+        self.user_client_6 = APIClient()
+        self.user_client_6.credentials(HTTP_AUTHORIZATION="Token " + self.token_user_6.key)
+
         self.review_1 = Review.objects.create(
             business_user=self.user_2,
             reviewer=self.user_3,
@@ -209,7 +215,7 @@ class TestReviews(TestProfiles):
     def test_offer_post_201(self):
         url = reverse('reviews-list')
         payload = {
-            "business_user": self.user_2.id,
+            "business_user": self.user_6.id,
             "rating": 4,
             "description": "Alles war toll!"
         }
@@ -219,7 +225,7 @@ class TestReviews(TestProfiles):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response_data['id'], 3)
-        self.assertEqual(response_data['business_user'], 2)
+        self.assertEqual(response_data['business_user'], 6)
         self.assertEqual(response_data['reviewer'], 3)
         self.assertEqual(response_data['rating'], 4)
         self.assertEqual(response_data['description'], "Alles war toll!")
@@ -236,13 +242,25 @@ class TestReviews(TestProfiles):
 
         for p in missing_field_payloads:
             response = self.user_client_3.post(url, p, format='json')
-            print(response.json())
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    # def test_offer_post_duplicate_400(self):
-    #     url = reverse('reviews-list')
-    #     payload = {"business_user": self.user_2.id, "rating": 2, "description": "Nicht toll!"}
-    #     self.user_client_3.post(url, payload, format='json')
-    #     response = self.user_client_3.post(url, payload, format='json')
+    def test_offer_post_duplicate_400(self):
+        url = reverse('reviews-list')
+        payload = {"business_user": self.user_2.id, "rating": 2, "description": "Nicht toll!"}
+        self.user_client_3.post(url, payload, format='json')
+        response = self.user_client_3.post(url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    def test_offer_post_401(self):
+        url = reverse('reviews-list')
+        payload = {"business_user": self.user_2.id, "rating": 2, "description": "Nicht toll!"}
+        self.user_client_3.logout()
+        response = self.user_client_3.post(url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_offer_post_403(self):
+        url = reverse('reviews-list')
+        payload = {"business_user": self.user_2.id, "rating": 2, "description": "Nicht toll!"}
+        response = self.user_client_6.post(url, payload, format='json')
+        print(response.json())
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
