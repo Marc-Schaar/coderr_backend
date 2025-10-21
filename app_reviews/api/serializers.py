@@ -30,4 +30,4 @@ class ReviewDetailSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at'
         ]
-        read_only_fields = ('business_user', 'reviewer', 'created_at', 'updated_at')
+        read_only_fields = ('id', 'business_user', 'reviewer', 'created_at', 'updated_at')
