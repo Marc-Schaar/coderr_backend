@@ -279,3 +279,19 @@ class TestReviews(TestProfiles):
 
             for key, value in payload.items():
                 self.assertEqual(getattr(self.review_1, key), value)
+
+    def test_review_patch_400(self):
+        url = reverse('reviews-detail', kwargs={"pk": self.review_1.id})
+        invalid_payloads = [
+            {"business_user": 1},
+            {"reviewer": 3},
+            {"created_at": "2024-01-01T00:00:00Z"},
+            {"updated_at": "2024-01-01T00:00:00Z"},
+
+        ]
+        for payload in invalid_payloads:
+            response = self.user_client_1.patch(url, payload, format='json')
+            print(response.json())
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+            # Der test ist noch nicht ferig gerade den detail serilaizer angepasst

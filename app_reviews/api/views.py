@@ -4,7 +4,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework import generics, filters
 from app_reviews.models import Review
 
-from .serializers import ReviewSerializer
+from .serializers import ReviewSerializer, ReviewDetailSerializer
 from .filters import ReviewFilter
 from .permissions import IsCustomerUserOrReadOnly
 
@@ -28,10 +28,11 @@ class ReviewListView(generics.ListCreateAPIView):
 
 class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
-    serializer_class = ReviewSerializer
+    serializer_class = ReviewDetailSerializer
     lookup_field = "pk"
 
     def perform_update(self, serializer):
-        instance = serializer.save()
-        instance.updated_at = timezone.now()
-        instance.save(update_fields=["updated_at"])
+        if serializer.is_valid():
+            instance = serializer.save()
+            instance.updated_at = timezone.now()
+            instance.save(update_fields=["updated_at"])
