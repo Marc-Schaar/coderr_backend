@@ -1,10 +1,7 @@
-<<<<<<< HEAD
-__pycache__/
-*.pyc
-db.sqlite3
-=======
+
 # Python
 __pycache__/
+*.pyc
 *.py[cod]
 *.pyo
 *.pyd
@@ -49,4 +46,3 @@ dist/
 
 # Environment variables
 *.env
->>>>>>> dff4fd90629127395983f71009d611a5c5e66152

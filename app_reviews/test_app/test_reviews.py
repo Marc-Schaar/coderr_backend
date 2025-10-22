@@ -262,7 +262,6 @@ class TestReviews(TestProfiles):
         url = reverse('reviews-list')
         payload = {"business_user": self.user_2.id, "rating": 2, "description": "Nicht toll!"}
         response = self.user_client_6.post(url, payload, format='json')
-        print(response.json())
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_review_patch_200(self):
@@ -291,7 +290,4 @@ class TestReviews(TestProfiles):
         ]
         for payload in invalid_payloads:
             response = self.user_client_1.patch(url, payload, format='json')
-            print(response.json())
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-            # Der test ist noch nicht ferig gerade den detail serilaizer angepasst

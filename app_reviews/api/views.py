@@ -32,7 +32,6 @@ class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = "pk"
 
     def perform_update(self, serializer):
-        if serializer.is_valid():
-            instance = serializer.save()
-            instance.updated_at = timezone.now()
-            instance.save(update_fields=["updated_at"])
+        instance = serializer.save()
+        instance.updated_at = timezone.now()
+        instance.save(update_fields=["updated_at"])
