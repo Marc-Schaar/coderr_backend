@@ -284,13 +284,13 @@ class Test_Offer_List(TestProfiles):
             ]
         }
         data = response.json()
-        self.assertDictEqual(response.json(), expected_data)
+        self.assertDictEqual(data, expected_data)
 
-    # def test_offer_post_400(self):
-    #     url = reverse("offer-list")
-    #     data = {}
-    #     response = self.user_client_1.post(url, data, format='json')
-    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    def test_offer_post_400(self):
+        url = reverse("offer-list")
+        data = {}
+        response = self.user_client_1.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     # def test_offer_post_401(self):
     #     url = reverse("offer-list")

@@ -7,7 +7,7 @@ from app_accounts.api.serializers import UserListSerializer
 class OfferDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = OfferDetails
-        fields = ['title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type']
+        fields = ['id', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type']
 
 
 class OfferListSerializer(serializers.ModelSerializer):
@@ -33,14 +33,12 @@ class OfferListSerializer(serializers.ModelSerializer):
 
 
 class OfferCreateSerializer(serializers.ModelSerializer):
-   # user = serializers.PrimaryKeyRelatedField(read_only=True)
     details = OfferDetailsSerializer(many=True)
 
     class Meta:
         model = Offer
         fields = [
             'id',
-            # 'user',
             'title',
             'image',
             'description',
