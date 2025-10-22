@@ -17,3 +17,17 @@ class IsCustomerUserOrReadOnly(permissions.BasePermission):
             )
 
         return True
+
+
+class IsOwnerOrReadOnly(permissions.BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        if obj.reviewer != request.user:
+            raise PermissionDenied(
+                "Du darfst nur deine eigenen Bewertungen bearbeiten oder löschen."
+            )
+
+        return True

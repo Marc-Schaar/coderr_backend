@@ -291,3 +291,18 @@ class TestReviews(TestProfiles):
         for payload in invalid_payloads:
             response = self.user_client_1.patch(url, payload, format='json')
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_review_patch_401(self):
+        url = reverse('reviews-detail', kwargs={"pk": self.review_1.id})
+        payload = {"business_user": 1},
+        self.user_client_1.logout()
+
+        response = self.user_client_1.patch(url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_review_patch_403(self):
+        url = reverse('reviews-detail', kwargs={"pk": self.review_1.id})
+        payload = {"rating": 1},
+
+        response = self.user_client_1.patch(url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

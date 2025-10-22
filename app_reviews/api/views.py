@@ -6,7 +6,7 @@ from app_reviews.models import Review
 
 from .serializers import ReviewSerializer, ReviewDetailSerializer
 from .filters import ReviewFilter
-from .permissions import IsCustomerUserOrReadOnly
+from .permissions import IsCustomerUserOrReadOnly, IsOwnerOrReadOnly
 
 
 class ReviewListView(generics.ListCreateAPIView):
@@ -30,6 +30,7 @@ class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewDetailSerializer
     lookup_field = "pk"
+    permission_classes = [IsOwnerOrReadOnly]
 
     def perform_update(self, serializer):
         instance = serializer.save()
