@@ -6,9 +6,12 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db.models import Avg
+from rest_framework.permissions import AllowAny
 
 
 class BaseInfoView(APIView):
+    permission_classes = [AllowAny]
+
     def get(self, request):
         review_count = Review.objects.count()
         avg = Review.objects.aggregate(avg=Avg('rating'))['avg'] or 0.0
