@@ -306,3 +306,10 @@ class TestReviews(TestProfiles):
 
         response = self.user_client_1.patch(url, payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_review_patch_404(self):
+        url = reverse('reviews-detail', kwargs={"pk": 999999})
+        payload = {"rating": 1}
+
+        response = self.user_client_1.patch(url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
