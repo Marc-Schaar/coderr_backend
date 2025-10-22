@@ -1,11 +1,11 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import generics, filters, status
-from rest_framework.response import Response
+from rest_framework import generics, filters
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from app_accounts.models import User
 from app_offers.models import Offer
+from app_offers.api.permissions import IsBusinessUserOrReadOnly
+
 
 from .serializers import OfferListSerializer, OfferCreateSerializer
 from .filters import OfferFilter
@@ -19,7 +19,6 @@ class CustomPagination(PageNumberPagination):
 
 class OfferView(generics.ListCreateAPIView):
     queryset = Offer.objects.all()
-    permission_classes = [AllowAny]
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = OfferFilter
@@ -27,22 +26,11 @@ class OfferView(generics.ListCreateAPIView):
     ordering = ['id']
     search_fields = ['title', 'description',]
 
+    def get_permissions(self):
+        return [IsAuthenticated(), IsBusinessUserOrReadOnly()] if self.request.method == 'POST' else [AllowAny()]
+
     def get_serializer_class(self):
-        if self.request.method == 'POST':
-            return OfferCreateSerializer
-        return OfferListSerializer
+        return OfferCreateSerializer if self.request.method == 'POST' else OfferListSerializer
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
-    def list(self, request, *args, **kwargs):
-        creator_id = request.query_params.get('creator_id')
-
-        if creator_id:
-            if not User.objects.filter(id=creator_id).exists():
-                return Response(
-                    {"creator_id": "User does not exist."},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-
-        return super().list(request, *args, **kwargs)

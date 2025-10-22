@@ -321,27 +321,107 @@ class Test_Offer_List(TestProfiles):
         response = self.user_client_1.post(url, payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    # def test_offer_post_401(self):
-    #     url = reverse("offer-list")
-    #     data = {
-    #         "user": self.user_2.id,
-    #         "title": "New Offer",
-    #         "description": "This is a new offer.",
-    #         "min_price": 500,
-    #         "min_delivery_time": 5,
-    #     }
-    #     self.user_client_1.logout()
-    #     response = self.user_client_1.post(url, data, format='json')
-    #     self.assertEqual(response.status_code, status.Http_401_UNAUTHORIZED)
+    def test_offer_post_400(self):
+        url = reverse("offer-list")
 
-    # def test_offer_post_403(self):
-    #     url = reverse("offer-list")
-    #     data = {
-    #         "user": self.user_2.id,
-    #         "title": "New Offer",
-    #         "description": "This is a new offer.",
-    #         "min_price": 500,
-    #         "min_delivery_time": 5,
-    #     }
-    #     response = self.user_client_1.post(url, data, format='json')
-    #     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        required_fields = ["title", "revisions", "delivery_time_in_days", "price", "features", "offer_type"]
+        base_payload = {
+            "title": "Grafikdesign-Paket",
+            "image": None,
+            "description": "Ein umfassendes Grafikdesign-Paket für Unternehmen.",
+            "details": [
+                {
+                    "title": "Basic Design",
+                    "revisions": 2,
+                    "delivery_time_in_days": 5,
+                    "price": 100,
+                    "features": ["Logo Design", "Visitenkarte"],
+                    "offer_type": "basic"
+                },
+                {
+                    "title": "Standard Design",
+                    "revisions": 5,
+                    "delivery_time_in_days": 7,
+                    "price": 200,
+                    "features": ["Logo Design", "Visitenkarte", "Briefpapier"],
+                    "offer_type": "standard"
+                },
+                {
+                    "title": "Premium Design",
+                    "revisions": 10,
+                    "delivery_time_in_days": 10,
+                    "price": 500,
+                    "features": ["Logo Design", "Visitenkarte", "Briefpapier", "Flyer"],
+                    "offer_type": "premium"
+                }
+            ]
+        }
+
+        for field in required_fields:
+            payload_missing_field = base_payload.copy()
+            payload_missing_field["details"] = [d.copy() for d in base_payload["details"]]
+            payload_missing_field["details"][0].pop(field)
+            response = self.user_client_1.post(url, payload_missing_field, format='json')
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+            self.assertIn(field, str(response.data))
+
+    def test_offer_post_401(self):
+        url = reverse("offer-list")
+        data = {
+            "user": self.user_2.id,
+            "title": "New Offer",
+            "description": "This is a new offer.",
+            "min_price": 500,
+            "min_delivery_time": 5,
+        }
+        self.user_client_1.logout()
+        response = self.user_client_1.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_offer_post_403(self):
+        url = reverse("offer-list")
+        payload = {
+            "title": "Grafikdesign-Paket",
+            "image": None,
+            "description": "Ein umfassendes Grafikdesign-Paket für Unternehmen.",
+            "details": [
+                {
+                           "title": "Basic Design",
+                           "revisions": 2,
+                           "delivery_time_in_days": 5,
+                           "price": 100,
+                           "features": [
+                               "Logo Design",
+                               "Visitenkarte"
+                           ],
+                    "offer_type": "basic"
+                },
+                {
+                    "title": "Standard Design",
+                    "revisions": 5,
+                    "delivery_time_in_days": 7,
+                    "price": 200,
+                    "features": [
+                        "Logo Design",
+                        "Visitenkarte",
+                        "Briefpapier"
+                    ],
+                    "offer_type": "standard"
+                },
+                {
+                    "title": "Premium Design",
+                    "revisions": 10,
+                    "delivery_time_in_days": 10,
+                    "price": 500,
+                    "features": [
+                        "Logo Design",
+                        "Visitenkarte",
+                        "Briefpapier",
+                        "Flyer"
+                    ],
+                    "offer_type": "premium"
+                }
+            ]
+        }
+        response = self.user_client_2.post(url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
