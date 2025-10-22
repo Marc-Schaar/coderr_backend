@@ -313,3 +313,10 @@ class TestReviews(TestProfiles):
 
         response = self.user_client_1.patch(url, payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_review_delete_200(self):
+        url = reverse('reviews-detail', kwargs={"pk": self.review_1.id})
+        payload = {"rating": 1}
+
+        response = self.user_client_3.delete(url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
