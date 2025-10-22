@@ -1,7 +1,8 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils import timezone
-from rest_framework.exceptions import ValidationError
 from rest_framework import generics, filters
+from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated
 from app_reviews.models import Review
 
 from .serializers import ReviewSerializer, ReviewDetailSerializer
@@ -15,7 +16,7 @@ class ReviewListView(generics.ListCreateAPIView):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = ReviewFilter
     ordering_fields = ['updated_at', 'rating']
-    permission_classes = [IsCustomerUserOrReadOnly]
+    permission_classes = [IsAuthenticated, IsCustomerUserOrReadOnly]
 
     def perform_create(self, serializer):
         reviewer = self.request.user
@@ -30,7 +31,7 @@ class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewDetailSerializer
     lookup_field = "pk"
-    permission_classes = [IsOwnerOrReadOnly]
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def perform_update(self, serializer):
         instance = serializer.save()
