@@ -19,7 +19,6 @@ class CustomPagination(PageNumberPagination):
 
 class OfferView(generics.ListCreateAPIView):
     queryset = Offer.objects.all()
-    # serializer_class = OfferSerializer
     permission_classes = [AllowAny]
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]

@@ -286,10 +286,39 @@ class Test_Offer_List(TestProfiles):
         data = response.json()
         self.assertDictEqual(data, expected_data)
 
-    def test_offer_post_400(self):
+    def test_offer_post_missing_details_400(self):
         url = reverse("offer-list")
-        data = {}
-        response = self.user_client_1.post(url, data, format='json')
+        payload = {"title": "Grafikdesign-Paket",
+                   "image": None,
+                   "description": "Ein umfassendes Grafikdesign-Paket für Unternehmen.",
+                   "details": [
+                       {
+                           "title": "Basic Design",
+                           "revisions": 2,
+                           "delivery_time_in_days": 5,
+                           "price": 100,
+                           "features": [
+                            "Logo Design",
+                            "Visitenkarte"
+                           ],
+                           "offer_type": "basic"
+                       },
+                       {
+                           "title": "Standard Design",
+                           "revisions": 5,
+                           "delivery_time_in_days": 7,
+                           "price": 200,
+                           "features": [
+                               "Logo Design",
+                               "Visitenkarte",
+                               "Briefpapier"
+                           ],
+                           "offer_type": "standard"
+                       },
+
+                   ]
+                   }
+        response = self.user_client_1.post(url, payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     # def test_offer_post_401(self):
