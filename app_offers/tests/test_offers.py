@@ -6,7 +6,7 @@ from rest_framework.test import APIClient, APITestCase
 from app_accounts.models import User
 from app_offers.models import Offer
 
-from app_offers.api.serializers import OfferSerializer
+from app_offers.api.serializers import OfferListSerializer, OfferCreateSerializer
 
 
 class TestProfiles(APITestCase):
@@ -18,7 +18,7 @@ class TestProfiles(APITestCase):
         self.user_client_1.credentials(HTTP_AUTHORIZATION="Token " + self.token_user_1.key)
 
         self.user_2 = User.objects.create_user(
-            username="mschaar", password="examplePassword", email="test2@test.de", type="business", first_name="Marc", last_name="Schaar")
+            username="mschaar", password="examplePassword", email="test2@test.de", type="customer", first_name="Marc", last_name="Schaar")
         self.token_user_2 = Token.objects.create(user=self.user_2)
         self.user_client_2 = APIClient()
         self.user_client_2.credentials(HTTP_AUTHORIZATION="Token " + self.token_user_2.key)
@@ -59,7 +59,7 @@ class Test_Offer_List(TestProfiles):
             "count": 3,
             "next": None,
             "previous": None,
-            "results": OfferSerializer([self.offer_1, self.offer_2, self.offer_3], many=True).data
+            "results": OfferListSerializer([self.offer_1, self.offer_2, self.offer_3], many=True).data
         }
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(response.json(), expected_dict)
@@ -73,7 +73,7 @@ class Test_Offer_List(TestProfiles):
             "count": 3,
             "next": None,
             "previous": None,
-            "results": OfferSerializer([self.offer_1, self.offer_2, self.offer_3], many=True).data
+            "results": OfferListSerializer([self.offer_1, self.offer_2, self.offer_3], many=True).data
         }
         self.assertDictEqual(response.json(), expected_dict)
 
@@ -111,7 +111,7 @@ class Test_Offer_List(TestProfiles):
             "count": 3,
             "next": None,
             "previous": None,
-            "results": OfferSerializer([self.offer_1, self.offer_2, self.offer_3], many=True).data
+            "results": OfferListSerializer([self.offer_1, self.offer_2, self.offer_3], many=True).data
         }
         self.assertDictEqual(response.json(), expected_dict)
 
@@ -125,7 +125,7 @@ class Test_Offer_List(TestProfiles):
             "count": 1,
             "next": None,
             "previous": None,
-            "results": [OfferSerializer(self.offer_1).data]
+            "results": [OfferListSerializer(self.offer_1).data]
         }
         self.assertDictEqual(response.json(), expected_dict)
 
@@ -136,7 +136,7 @@ class Test_Offer_List(TestProfiles):
             "count": 2,
             "next": None,
             "previous": None,
-            "results": OfferSerializer([self.offer_1, self.offer_2], many=True).data
+            "results": OfferListSerializer([self.offer_1, self.offer_2], many=True).data
         }
         self.assertDictEqual(response.json(), expected_dict)
 
@@ -148,7 +148,7 @@ class Test_Offer_List(TestProfiles):
             "count": 3,
             "next": None,
             "previous": None,
-            "results": OfferSerializer([self.offer_2, self.offer_1, self.offer_3], many=True).data
+            "results": OfferListSerializer([self.offer_2, self.offer_1, self.offer_3], many=True).data
         }
         self.assertDictEqual(response.json(), expected_dict)
 
@@ -160,7 +160,7 @@ class Test_Offer_List(TestProfiles):
             "count": 3,
             "next": None,
             "previous": None,
-            "results": OfferSerializer([self.offer_1, self.offer_2, self.offer_3], many=True).data
+            "results": OfferListSerializer([self.offer_1, self.offer_2, self.offer_3], many=True).data
         }
         self.assertDictEqual(response.json(), expected_dict)
 
@@ -172,7 +172,7 @@ class Test_Offer_List(TestProfiles):
             "count": 1,
             "next": None,
             "previous": None,
-            "results": [OfferSerializer(self.offer_3).data]
+            "results": [OfferListSerializer(self.offer_3).data]
         }
         self.assertDictEqual(response.json(), expected_dict)
 
@@ -184,6 +184,135 @@ class Test_Offer_List(TestProfiles):
             "count": 1,
             "next": None,
             "previous": None,
-            "results": [OfferSerializer(self.offer_3).data]
+            "results": [OfferListSerializer(self.offer_3).data]
         }
         self.assertDictEqual(response.json(), expected_dict)
+
+    def test_offer_post_201(self):
+        url = reverse("offer-list")
+        payload = {
+            "title": "Grafikdesign-Paket",
+            "image": None,
+            "description": "Ein umfassendes Grafikdesign-Paket für Unternehmen.",
+            "details": [
+                {
+                     "title": "Basic Design",
+                     "revisions": 2,
+                     "delivery_time_in_days": 5,
+                     "price": 100,
+                     "features": [
+                         "Logo Design",
+                         "Visitenkarte"
+                     ],
+                    "offer_type": "basic"
+                },
+                {
+                    "title": "Standard Design",
+                    "revisions": 5,
+                    "delivery_time_in_days": 7,
+                    "price": 200,
+                    "features": [
+                        "Logo Design",
+                        "Visitenkarte",
+                        "Briefpapier"
+                    ],
+                    "offer_type": "standard"
+                },
+                {
+                    "title": "Premium Design",
+                    "revisions": 10,
+                    "delivery_time_in_days": 10,
+                    "price": 500,
+                    "features": [
+                        "Logo Design",
+                        "Visitenkarte",
+                        "Briefpapier",
+                        "Flyer"
+                    ],
+                    "offer_type": "premium"
+                }
+            ]
+        }
+        response = self.user_client_1.post(url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        expected_data = {
+            "id": 4,
+            "title": "Grafikdesign-Paket",
+            "image": None,
+            "description": "Ein umfassendes Grafikdesign-Paket für Unternehmen.",
+            "details": [
+                {
+                    "id": 1,
+                    "title": "Basic Design",
+                    "revisions": 2,
+                    "delivery_time_in_days": 5,
+                    "price": 100,
+                    "features": [
+                        "Logo Design",
+                        "Visitenkarte"
+                    ],
+                    "offer_type": "basic"
+                },
+                {
+                    "id": 2,
+                    "title": "Standard Design",
+                    "revisions": 5,
+                    "delivery_time_in_days": 7,
+                    "price": 200,
+                    "features": [
+                        "Logo Design",
+                        "Visitenkarte",
+                        "Briefpapier"
+                    ],
+                    "offer_type": "standard"
+                },
+                {
+                    "id": 3,
+                    "title": "Premium Design",
+                    "revisions": 10,
+                    "delivery_time_in_days": 10,
+                    "price": 500,
+                    "features": [
+                        "Logo Design",
+                        "Visitenkarte",
+                        "Briefpapier",
+                        "Flyer"
+                    ],
+                    "offer_type": "premium"
+                }
+            ]
+        }
+        data = response.json()
+        self.assertDictEqual(response.json(), expected_data)
+
+    # def test_offer_post_400(self):
+    #     url = reverse("offer-list")
+    #     data = {}
+    #     response = self.user_client_1.post(url, data, format='json')
+    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    # def test_offer_post_401(self):
+    #     url = reverse("offer-list")
+    #     data = {
+    #         "user": self.user_2.id,
+    #         "title": "New Offer",
+    #         "description": "This is a new offer.",
+    #         "min_price": 500,
+    #         "min_delivery_time": 5,
+    #     }
+    #     self.user_client_1.logout()
+    #     response = self.user_client_1.post(url, data, format='json')
+    #     self.assertEqual(response.status_code, status.Http_401_UNAUTHORIZED)
+
+    # def test_offer_post_403(self):
+    #     url = reverse("offer-list")
+    #     data = {
+    #         "user": self.user_2.id,
+    #         "title": "New Offer",
+    #         "description": "This is a new offer.",
+    #         "min_price": 500,
+    #         "min_delivery_time": 5,
+    #     }
+    #     response = self.user_client_1.post(url, data, format='json')
+    #     self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

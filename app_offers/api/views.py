@@ -7,7 +7,7 @@ from rest_framework.permissions import AllowAny
 from app_accounts.models import User
 from app_offers.models import Offer
 
-from .serializers import OfferSerializer
+from .serializers import OfferListSerializer, OfferCreateSerializer
 from .filters import OfferFilter
 
 
@@ -17,15 +17,24 @@ class CustomPagination(PageNumberPagination):
     max_page_size = 100
 
 
-class OfferView(generics.ListAPIView):
-    queryset = Offer.objects.all().order_by('id')
-    serializer_class = OfferSerializer
+class OfferView(generics.ListCreateAPIView):
+    queryset = Offer.objects.all()
+    # serializer_class = OfferSerializer
     permission_classes = [AllowAny]
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = OfferFilter
     ordering_fields = ['updated_at', 'min_price']
+    ordering = ['id']
     search_fields = ['title', 'description',]
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return OfferCreateSerializer
+        return OfferListSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
     def list(self, request, *args, **kwargs):
         creator_id = request.query_params.get('creator_id')
