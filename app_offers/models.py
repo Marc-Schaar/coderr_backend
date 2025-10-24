@@ -9,7 +9,7 @@ class Offer(models.Model):
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    min_price = models.FloatField(blank=False, default=0)
+    min_price = models.IntegerField(blank=False, default=0)
     min_delivery_time = models.IntegerField(blank=False, default=0)
 
     def __str__(self):

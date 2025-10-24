@@ -7,7 +7,7 @@ from app_offers.models import Offer
 from app_offers.api.permissions import IsBusinessUserOrReadOnly
 
 
-from .serializers import OfferListSerializer, OfferCreateSerializer
+from .serializers import OfferListSerializer, OfferCreateSerializer, OfferDetailSerializer
 from .filters import OfferFilter
 
 
@@ -34,3 +34,9 @@ class OfferView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class OfferDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Offer.objects.all()
+    lookup_field = 'pk'
+    serializer_class = OfferDetailSerializer

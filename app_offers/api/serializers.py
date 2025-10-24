@@ -12,7 +12,8 @@ class OfferDetailsSerializer(serializers.ModelSerializer):
 
 class OfferListSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(read_only=True)
-    details = OfferDetailsSerializer(many=True)
+    # details = OfferDetailsSerializer(many=True)
+    details = serializers.SerializerMethodField()
     user_details = UserListSerializer(source='user', read_only=True)
 
     class Meta:
@@ -29,6 +30,18 @@ class OfferListSerializer(serializers.ModelSerializer):
             'min_price',
             'min_delivery_time',
             'user_details',
+        ]
+
+    def get_details(self, obj):
+        request = self.context.get('request')
+        details = obj.details.all()
+
+        return [
+            {
+                "id": d.id,
+                "url": request.build_absolute_uri(f"/api/offerdetails/{d.id}/")
+            }
+            for d in details
         ]
 
 
@@ -66,5 +79,35 @@ class OfferCreateSerializer(serializers.ModelSerializer):
             offer.save()
 
         offer.details.set(created_details, bulk=False)
-        offer_serialized = OfferListSerializer(offer, context=self.context)
-        return offer_serialized.data
+        return offer
+
+
+class OfferDetailSerializer(serializers.ModelSerializer):
+    details = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Offer
+        fields = [
+            'id',
+            'user',
+            'title',
+            'image',
+            'description',
+            'details',
+            'created_at',
+            'updated_at',
+            'min_price',
+            'min_delivery_time',
+        ]
+
+    def get_details(self, obj):
+        request = self.context.get('request')
+        details = obj.details.all()
+
+        return [
+            {
+                "id": d.id,
+                "url": request.build_absolute_uri(f"/api/offerdetails/{d.id}/")
+            }
+            for d in details
+        ]
