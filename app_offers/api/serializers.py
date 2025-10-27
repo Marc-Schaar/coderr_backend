@@ -82,6 +82,40 @@ class OfferCreateSerializer(serializers.ModelSerializer):
         return offer
 
 
+class OfferUpdateSerializer(serializers.ModelSerializer):
+    details = OfferDetailsSerializer(many=True)
+
+    class Meta:
+        model = Offer
+        fields = [
+            'id',
+            'title',
+            'image',
+            'description',
+            'details',
+        ]
+
+    def update(self, instance, validated_data):
+        details_data = validated_data.pop('details', [])
+
+        for key, value in validated_data.items():
+            setattr(instance, key, value)
+        instance.save()
+
+        for detail_data in details_data:
+            offer_type = detail_data.get("offer_type")
+            detail = instance.details.get(offer_type=offer_type)
+            for key, value in detail_data.items():
+                setattr(detail, key, value)
+            detail.save()
+
+        if instance.details.exists():
+            instance.min_price = min(d.price for d in instance.details.all())
+            instance.min_delivery_time = min(d.delivery_time_in_days for d in instance.details.all())
+            instance.save()
+        return instance
+
+
 class OfferDetailSerializer(serializers.ModelSerializer):
     details = serializers.SerializerMethodField()
 

@@ -64,7 +64,7 @@ class TestProfiles(APITestCase):
             delivery_time_in_days=7,
             price=200,
             features=["Logo Design", "Visitenkarte", "Briefpapier"],
-            offer_type="standart"
+            offer_type="standard"
         )
 
         self.offer_detail_3 = OfferDetails.objects.create(
@@ -81,7 +81,7 @@ class TestProfiles(APITestCase):
 class Test_Offer(TestProfiles):
     maxDiff = None
 
-    def test_offer_list(self):
+    def test_offer_list_get_200(self):
         url = reverse("offer-list")
         response = self.user_client_1.get(url)
 
@@ -98,7 +98,7 @@ class Test_Offer(TestProfiles):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(response.json(), expected_dict)
 
-    def test_offer_list_filter_by_creator_id_200(self):
+    def test_offer_list_filter_by_creator_id_get_200(self):
         url = reverse("offer-list") + f"?creator_id={self.user_1.id}"
         response = self.user_client_1.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -125,12 +125,12 @@ class Test_Offer(TestProfiles):
         }
         self.assertDictEqual(response.json(), expected_dict)
 
-    def test_offer_list_filter_by_creator_id_400(self):
+    def test_offer_list_filter_by_creator_id_get_400(self):
         url = reverse("offer-list") + f"?creator_id={99}"
         response = self.user_client_1.get(url)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_offer_list_filter_by_min_price_200(self):
+    def test_offer_list_filter_by_min_price_get_200(self):
         url = reverse("offer-list") + f"?min_price=1000000"
         response = self.user_client_1.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -157,7 +157,7 @@ class Test_Offer(TestProfiles):
         }
         self.assertDictEqual(response.json(), expected_dict)
 
-    def test_offer_list_filter_by_max_delivery_time_200(self):
+    def test_offer_list_filter_by_max_delivery_time_get_200(self):
         url = reverse("offer-list") + f"?max_delivery_time=7"
         response = self.user_client_1.get(url)
 
@@ -190,7 +190,7 @@ class Test_Offer(TestProfiles):
         }
         self.assertDictEqual(response.json(), expected_dict)
 
-    def test_offer_list_ordering_min_price(self):
+    def test_offer_list_ordering_min_price_get_200(self):
         url = reverse("offer-list") + f"?ordering=min_price"
         response = self.user_client_1.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -206,7 +206,7 @@ class Test_Offer(TestProfiles):
         }
         self.assertDictEqual(response.json(), expected_dict)
 
-    def test_offer_list_ordering_updated_at(self):
+    def test_offer_list_ordering_updated_at_get_200(self):
         url = reverse("offer-list") + f"?ordering=updated_at"
         response = self.user_client_1.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -222,7 +222,7 @@ class Test_Offer(TestProfiles):
         }
         self.assertDictEqual(response.json(), expected_dict)
 
-    def test_offer_list_search_title(self):
+    def test_offer_list_search_title_get_200(self):
         url = reverse("offer-list") + f"?search=Design 3"
         response = self.user_client_1.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -237,7 +237,7 @@ class Test_Offer(TestProfiles):
         }
         self.assertDictEqual(response.json(), expected_dict)
 
-    def test_offer_list_search_description(self):
+    def test_offer_list_search_description_get_200(self):
         url = reverse("offer-list") + f"?search=Test"
         response = self.user_client_1.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -490,7 +490,7 @@ class Test_Offer(TestProfiles):
         response = self.user_client_2.post(url, payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_offer_detail_200(self):
+    def test_offer_detail_get_200(self):
         url = reverse("offer-detail", kwargs={"pk": self.offer_1.id})
         response = self.user_client_1.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -510,13 +510,96 @@ class Test_Offer(TestProfiles):
 
         self.assertDictEqual(data, expected_dict)
 
-    def test_offer_detail_401(self):
+    def test_offer_detail_get_401(self):
         url = reverse("offer-detail", kwargs={"pk": self.offer_1.id})
         self.user_client_1.logout()
         response = self.user_client_1.get(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_offer_detail_404(self):
+    def test_offer_detail_get_404(self):
         url = reverse("offer-detail", kwargs={"pk": 9999999})
         response = self.user_client_1.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_offer_detail_get_404(self):
+        url = reverse("offer-detail", kwargs={"pk": 9999999})
+        response = self.user_client_1.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_offer_detail_patch_200(self):
+        url = reverse("offer-detail", kwargs={"pk": self.offer_1.id})
+        payload = {
+            "title": "Updated Grafikdesign-Paket",
+            "details": [
+                {
+                    "title": "Basic Design Updated",
+                    "revisions": 3,
+                    "delivery_time_in_days": 6,
+                    "price": 120,
+                    "features": [
+                        "Logo Design",
+                        "Flyer"
+                    ],
+                    "offer_type": "basic"
+                }
+            ]
+        }
+        response = self.user_client_1.patch(url, payload, format='json')
+        print("Response", response.json())
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = response.json()
+        expected_dict = {
+            "id": data["id"],
+            "title": "Updated Grafikdesign-Paket",
+            "image": None,
+            "description": self.offer_1.description,
+            "details": [
+                {
+                    "id": data["details"][0]["id"],
+                    "title": "Basic Design Updated",
+                    "revisions": 3,
+                    "delivery_time_in_days": 6,
+                    "price": 120,
+                    "features": [
+                        "Logo Design",
+                        "Flyer"
+                    ],
+                    "offer_type": "basic"
+                },
+                {
+                    "id": data["details"][1]["id"],
+                    "title": "Standard Design",
+                    "revisions": 5,
+                    "delivery_time_in_days": 7,
+                    "price": 200,
+                    "features": [
+                        "Logo Design",
+                        "Visitenkarte",
+                        "Briefpapier"
+                    ],
+                    "offer_type": "standard"
+                },
+                {
+                    "id": data["details"][2]["id"],
+                    "title": "Premium Design",
+                    "revisions": 10,
+                    "delivery_time_in_days": 10,
+                    "price": 500,
+                    "features": [
+                        "Logo Design",
+                        "Visitenkarte",
+                        "Briefpapier",
+                        "Flyer"
+                    ],
+                    "offer_type": "premium"
+                }
+            ]
+
+        }
+        self.assertDictEqual(data, expected_dict)
+
+    def test_offer_detail_delete_204(self):
+        url = reverse("offer-detail", kwargs={"pk": self.offer_1.id})
+        response = self.user_client_1.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
