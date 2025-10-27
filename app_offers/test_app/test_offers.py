@@ -545,7 +545,6 @@ class Test_Offer(TestProfiles):
             ]
         }
         response = self.user_client_1.patch(url, payload, format='json')
-        print("Response", response.json())
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         data = response.json()
@@ -599,7 +598,94 @@ class Test_Offer(TestProfiles):
         }
         self.assertDictEqual(data, expected_dict)
 
+    def test_offer_detail_patch_400(self):
+        url = reverse("offer-detail", kwargs={"pk": self.offer_1.id})
+
+        payload = {'title': ""}
+        response = self.user_client_1.patch(url, payload, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        details_required_fields = [
+            "title",
+            "revisions",
+            "delivery_time_in_days",
+            "price",
+            "features",
+            "offer_type"
+        ]
+
+        for field in details_required_fields:
+            payload = {
+                "details": [
+                    {
+                        "title": "Basic Design Updated",
+                        "revisions": 3,
+                        "delivery_time_in_days": 6,
+                        "price": 120,
+                        "features": ["Logo Design", "Flyer"],
+                        "offer_type": "basic"
+                    }
+                ]
+            }
+            payload["details"][0].pop(field)
+
+            response = self.user_client_1.patch(url, payload, format="json")
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+            self.assertIn(field, str(response.data))
+
+    def test_offer_detail_patch_401(self):
+        url = reverse("offer-detail", kwargs={"pk": self.offer_1.id})
+        payload = {
+            "title": "Updated Grafikdesign-Paket",
+        }
+        self.user_client_1.logout()
+        response = self.user_client_1.patch(url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_offer_detail_patch_403(self):
+        url = reverse("offer-detail", kwargs={"pk": self.offer_1.id})
+        payload = {
+            "title": "Updated Grafikdesign-Paket",
+        }
+        response = self.user_client_2.patch(url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_offer_detail_patch_404(self):
+        url = reverse("offer-detail", kwargs={"pk": 9999})
+        payload = {
+            "title": "Updated Grafikdesign-Paket",
+        }
+        response = self.user_client_1.patch(url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_offer_detail_delete_204(self):
         url = reverse("offer-detail", kwargs={"pk": self.offer_1.id})
         response = self.user_client_1.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_offer_details_detail_get_200(self):
+        url = reverse("offer-details", kwargs={"pk": self.offer_detail_1.id})
+        response = self.user_client_1.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        expected_dict = {
+            "id": self.offer_detail_1.id,
+            "title": "Basic Design",
+            "revisions": 2,
+            "delivery_time_in_days": 5,
+            "price": 100,
+            "features": ["Logo Design", "Visitenkarte"],
+            "offer_type": "basic"
+        }
+        self.assertDictEqual(response.json(), expected_dict)
+
+    def test_offer_details_detail_get_401(self):
+        url = reverse("offer-details", kwargs={"pk": self.offer_detail_1.id})
+        self.user_client_1.logout()
+        response = self.user_client_1.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_offer_details_detail_get_404(self):
+        url = reverse("offer-details", kwargs={"pk": 9999})
+        response = self.user_client_1.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

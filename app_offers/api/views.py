@@ -3,11 +3,11 @@ from rest_framework import generics, filters
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from app_offers.models import Offer
-from app_offers.api.permissions import IsBusinessUserOrReadOnly
+from app_offers.models import Offer, OfferDetails
+from app_offers.api.permissions import IsBusinessUserOrReadOnly, IsOwnerOrReadOnly
 
 
-from .serializers import OfferListSerializer, OfferCreateSerializer, OfferUpdateSerializer, OfferDetailSerializer
+from .serializers import OfferListSerializer, OfferCreateSerializer, OfferUpdateSerializer, OfferDetailSerializer, OfferDetailsSerializer
 from .filters import OfferFilter
 
 
@@ -39,6 +39,13 @@ class OfferView(generics.ListCreateAPIView):
 class OfferDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Offer.objects.all()
     lookup_field = 'pk'
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_serializer_class(self):
         return OfferUpdateSerializer if self.request.method == 'PATCH' else OfferDetailSerializer
+
+
+class OfferDetailDetailView(generics.RetrieveAPIView):
+    queryset = OfferDetails.objects.all()
+    serializer_class = OfferDetailsSerializer
+    lookup_field = 'pk'

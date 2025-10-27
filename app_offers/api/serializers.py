@@ -12,7 +12,6 @@ class OfferDetailsSerializer(serializers.ModelSerializer):
 
 class OfferListSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(read_only=True)
-    # details = OfferDetailsSerializer(many=True)
     details = serializers.SerializerMethodField()
     user_details = UserListSerializer(source='user', read_only=True)
 
@@ -101,6 +100,10 @@ class OfferUpdateSerializer(serializers.ModelSerializer):
         for key, value in validated_data.items():
             setattr(instance, key, value)
         instance.save()
+
+        for detail_data in details_data:
+            detail_serializer = OfferDetailsSerializer(data=detail_data)
+            detail_serializer.is_valid(raise_exception=True)
 
         for detail_data in details_data:
             offer_type = detail_data.get("offer_type")

@@ -4,7 +4,7 @@ from app_accounts.models import User
 
 class Offer(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=100)
+    title = models.CharField(blank=False, max_length=100)
     image = models.ImageField(upload_to="offers_img", blank=True, null=True)
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -18,7 +18,7 @@ class Offer(models.Model):
 
 class OfferDetails(models.Model):
     offer = models.ForeignKey(Offer, on_delete=models.CASCADE, related_name='details')
-    title = models.CharField(max_length=100)
+    title = models.CharField(blank=False, max_length=100)
     revisions = models.IntegerField(blank=False)
     delivery_time_in_days = models.IntegerField(blank=False)
     price = models.IntegerField(blank=False)
