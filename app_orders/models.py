@@ -3,33 +3,30 @@ from app_accounts.models import User
 
 
 class Order(models.Model):
-    title = models.CharField(max_length=100)
-    price = models.IntegerField(default=0)
-    image = models.ImageField(upload_to="offers_img", blank=True, null=True)
-    description = models.TextField()
+    OFFER_TYPE_CHOICES = [
+        ('basic', 'Basic'),
+        ('standard', 'Standard'),
+        ('premium', 'Premium'),
+    ]
+
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    ]
+    customer_user = models.ForeignKey(User, related_name='customer_orders',
+                                      on_delete=models.CASCADE,  null=True, blank=True)
+    business_user = models.ForeignKey(User, related_name='business_orders',
+                                      on_delete=models.CASCADE, null=True, blank=True)
+    revisions = models.IntegerField()
+    delivery_time_in_days = models.IntegerField(null=True)
+    price = models.IntegerField()
+    features = models.JSONField(null=True, blank=True)
+    offer_type = models.CharField(max_length=10, choices=OFFER_TYPE_CHOICES, default='basic')
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    details = models.JSONField(null=True, blank=True)
-    min_price = models.FloatField()
-    min_delivery_time = models.IntegerField()
 
     def __str__(self):
         return self.title
-
-    {
-        "id": 1,
-        "customer_user": 1,
-        "business_user": 2,
-
-        "revisions": 3,
-        "delivery_time_in_days": 5,
-        "price": 150,
-        "features": [
-            "Logo Design",
-            "Visitenkarten"
-        ],
-        "offer_type": "basic",
-        "status": "in_progress",
-        "created_at": "2024-09-29T10:00:00Z",
-        "updated_at": "2024-09-30T12:00:00Z"
-    }
