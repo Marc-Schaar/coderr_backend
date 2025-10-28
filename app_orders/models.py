@@ -19,6 +19,7 @@ class Order(models.Model):
                                       on_delete=models.CASCADE,  null=True, blank=True)
     business_user = models.ForeignKey(User, related_name='business_orders',
                                       on_delete=models.CASCADE, null=True, blank=True)
+    title = models.CharField(max_length=255, null=True, blank=False)
     revisions = models.IntegerField()
     delivery_time_in_days = models.IntegerField(null=True)
     price = models.IntegerField()

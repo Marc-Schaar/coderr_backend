@@ -5,6 +5,7 @@ from rest_framework.test import APIClient, APITestCase
 
 from app_accounts.models import User
 from app_orders.models import Order
+from app_offers.models import Offer, OfferDetails
 
 
 class TestOrders(APITestCase):
@@ -27,6 +28,24 @@ class TestOrders(APITestCase):
         self.token_user_3 = Token.objects.create(user=self.user_3)
         self.user_client_3 = APIClient()
         self.user_client_3.credentials(HTTP_AUTHORIZATION="Token " + self.token_user_3.key)
+
+        self.offer_1 = Offer.objects.create(
+            user=self.user_1,
+            title="Website Design",
+            description="Professionelles Website-Design...",
+            min_price=1000,
+            min_delivery_time=7,
+        )
+
+        self.offer_detail_1 = OfferDetails.objects.create(
+            offer_id=1,
+            title="Basic Design",
+            revisions=2,
+            delivery_time_in_days=5,
+            price=100,
+            features=["Logo Design", "Visitenkarte"],
+            offer_type="basic"
+        )
 
         self.order_1 = Order.objects.create(
             customer_user=self.user_2,
@@ -60,7 +79,7 @@ class TestOrders(APITestCase):
             status="completed"
         )
 
-    def test_order_list_get_200_as_custommer_user(self):
+    def test_order_list_get_200_as_customer_user(self):
         url = reverse("order-list")
         response = self.user_client_2.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -72,6 +91,7 @@ class TestOrders(APITestCase):
             self.assertIn('id', data)
             self.assertIn('customer_user', data)
             self.assertIn('business_user', data)
+            self.assertIn('title', data)
             self.assertIn('revisions', data)
             self.assertIn('delivery_time_in_days', data)
             self.assertIn('price', data)
@@ -97,3 +117,12 @@ class TestOrders(APITestCase):
         self.user_client_1.logout()
         response = self.user_client_1.get(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_order_list_post_201(self):
+        url = reverse("order-list")
+        payload = {
+            "offer_detail_id": self.offer_detail_1.id,
+        }
+        response = self.user_client_2.post(url, payload, format='json')
+        print(response.json())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
