@@ -9,7 +9,7 @@ from app_offers.models import Offer, OfferDetails
 from app_offers.api.serializers import OfferListSerializer
 
 
-class TestProfiles(APITestCase):
+class TestOffer(APITestCase):
     def setUp(self):
         self.user_1 = User.objects.create_user(
             username="jdoe", password="examplePassword", email="test@test.de", type="business", first_name="John", last_name="Doe")
@@ -76,10 +76,6 @@ class TestProfiles(APITestCase):
             features=["Logo Design", "Visitenkarte", "Briefpapier", "Flyer"],
             offer_type="premium"
         )
-
-
-class Test_Offer(TestProfiles):
-    maxDiff = None
 
     def test_offer_list_get_200(self):
         url = reverse("offer-list")

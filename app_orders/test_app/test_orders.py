@@ -7,7 +7,7 @@ from app_accounts.models import User
 from app_orders.models import Order
 
 
-class TestProfiles(APITestCase):
+class TestOrders(APITestCase):
     def setUp(self):
         self.user_1 = User.objects.create_user(
             username="jdoe", password="examplePassword", email="test@test.de", type="business", first_name="John", last_name="Doe")
@@ -24,6 +24,9 @@ class TestProfiles(APITestCase):
         self.user_3 = User.objects.create_user(
             username="User3", password="testpassword", email="test3@test.de", type="customer", first_name="User", last_name="Test"
         )
+        self.token_user_3 = Token.objects.create(user=self.user_3)
+        self.user_client_3 = APIClient()
+        self.user_client_3.credentials(HTTP_AUTHORIZATION="Token " + self.token_user_3.key)
 
         self.order_1 = Order.objects.create(
             customer_user=self.user_2,
@@ -46,17 +49,24 @@ class TestProfiles(APITestCase):
             offer_type="basic",
             status="in_progress"
         )
+        self.order_3 = Order.objects.create(
+            customer_user=self.user_3,
+            business_user=self.user_1,
+            revisions=3,
+            delivery_time_in_days=7,
+            price=200,
+            features={"featureX": "valueX", "featureY": "valueY"},
+            offer_type="premium",
+            status="completed"
+        )
 
-
-class Test_Offer(TestProfiles):
-    maxDiff = None
-
-    def test_order_list_get_200(self):
+    def test_order_list_get_200_as_custommer_user(self):
         url = reverse("order-list")
-        response = self.user_client_1.get(url)
+        response = self.user_client_2.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         response_data = response.json()
         self.assertIsInstance(response_data, list)
+        self.assertEqual(len(response_data), 2)
         for data in response_data:
             self.assertIsInstance(data, dict)
             self.assertIn('id', data)
@@ -70,3 +80,20 @@ class Test_Offer(TestProfiles):
             self.assertIn('status', data)
             self.assertIn('created_at', data)
             self.assertIn('updated_at', data)
+
+        response = self.user_client_3.get(url)
+        self.assertEqual(len(response.json()), 1)
+
+    def test_order_list_get_200_as_business_user(self):
+        url = reverse("order-list")
+        response = self.user_client_1.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_data = response.json()
+        self.assertIsInstance(response_data, list)
+        self.assertEqual(len(response_data), 3)
+
+    def test_order_list_get_401(self):
+        url = reverse("order-list")
+        self.user_client_1.logout()
+        response = self.user_client_1.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
