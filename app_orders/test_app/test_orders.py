@@ -109,6 +109,7 @@ class TestOrders(APITestCase):
         response = self.user_client_1.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         response_data = response.json()
+
         self.assertIsInstance(response_data, list)
         self.assertEqual(len(response_data), 3)
 
@@ -123,7 +124,6 @@ class TestOrders(APITestCase):
         payload = {"offer_detail_id": self.offer_detail_1.id}
         response = self.user_client_2.post(url, payload, format='json')
         response_data = response.json()
-        print(response_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         self.assertIn('id', response_data)
