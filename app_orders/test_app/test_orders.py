@@ -120,9 +120,46 @@ class TestOrders(APITestCase):
 
     def test_order_list_post_201(self):
         url = reverse("order-list")
-        payload = {
-            "offer_detail_id": self.offer_detail_1.id,
-        }
+        payload = {"offer_detail_id": self.offer_detail_1.id}
         response = self.user_client_2.post(url, payload, format='json')
-        print(response.json())
+        response_data = response.json()
+        print(response_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        self.assertIn('id', response_data)
+        self.assertIn('customer_user', response_data)
+        self.assertIn('business_user', response_data)
+        self.assertIn('title', response_data)
+        self.assertIn('revisions', response_data)
+        self.assertIn('delivery_time_in_days', response_data)
+        self.assertIn('price', response_data)
+        self.assertIn('features', response_data)
+        self.assertIn('offer_type', response_data)
+        self.assertIn('status', response_data)
+        self.assertIn('created_at', response_data)
+        self.assertIn('updated_at', response_data)
+
+    def test_order_list_post_400(self):
+        url = reverse("order-list")
+        payload = {}
+        response = self.user_client_2.post(url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_order_list_post_401(self):
+        url = reverse("order-list")
+        payload = {"offer_detail_id": self.offer_detail_1.id}
+        self.user_client_2.logout()
+        response = self.user_client_2.post(url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_order_list_post_403(self):
+        url = reverse("order-list")
+        payload = {"offer_detail_id": self.offer_detail_1.id}
+        response = self.user_client_1.post(url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_order_list_post_404(self):
+        url = reverse("order-list")
+        payload = {"offer_detail_id": 9999}
+        response = self.user_client_2.post(url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

@@ -1,13 +1,16 @@
 from rest_framework import generics
 from rest_framework.exceptions import NotFound
+from rest_framework.permissions import IsAuthenticated
 
 from app_orders.models import Order
 from app_offers.models import OfferDetails
 from .serializers import OrderSerializer
+from .permissions import IsCustomerUserOrReadOnly
 
 
 class OrdersListView(generics.ListCreateAPIView):
     serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated, IsCustomerUserOrReadOnly]
 
     def get_queryset(self):
         user = self.request.user
