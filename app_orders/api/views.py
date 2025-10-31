@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from app_orders.models import Order
 from app_offers.models import OfferDetails
 from .serializers import OrderSerializer
-from .permissions import IsCustomerUserOrReadOnly
+from .permissions import IsCustomerUserOrReadOnly, IsBusinessUserOrReadOnly, IsAdminUserToDeleteOnly
 
 
 class OrdersListView(generics.ListCreateAPIView):
@@ -43,3 +43,10 @@ class OrdersListView(generics.ListCreateAPIView):
             offer_type=offer_detail.offer_type,
             status="in_progress",
         )
+
+
+class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    lookup_field = 'pk'
+    permission_classes = [IsAuthenticated, IsAdminUserToDeleteOnly, IsBusinessUserOrReadOnly]

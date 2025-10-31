@@ -29,6 +29,13 @@ class TestOrders(APITestCase):
         self.user_client_3 = APIClient()
         self.user_client_3.credentials(HTTP_AUTHORIZATION="Token " + self.token_user_3.key)
 
+        self.user_admin = User.objects.create_user(
+            username="UserAdmin", password="testpassword", email="test4@test.de", type="customer", first_name="User", last_name="Admin", is_staff=True
+        )
+        self.token_user_admin = Token.objects.create(user=self.user_admin)
+        self.user_client_admin = APIClient()
+        self.user_client_admin.credentials(HTTP_AUTHORIZATION="Token " + self.token_user_admin.key)
+
         self.offer_1 = Offer.objects.create(
             user=self.user_1,
             title="Website Design",
@@ -55,7 +62,7 @@ class TestOrders(APITestCase):
             price=150,
             features={"feature1": "value1", "feature2": "value2"},
             offer_type="standard",
-            status="pending"
+            status="in_progress"
         )
 
         self.order_2 = Order.objects.create(
@@ -162,4 +169,56 @@ class TestOrders(APITestCase):
         url = reverse("order-list")
         payload = {"offer_detail_id": 9999}
         response = self.user_client_2.post(url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_order_detail_patch_200(self):
+        url = reverse("order-detail", kwargs={"pk": self.order_1.id})
+        payload = {"status": "completed"}
+        response = self.user_client_1.patch(url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.order_1.refresh_from_db()
+        self.assertEqual(self.order_1.status, "completed")
+
+    def test_order_detail_patch_401(self):
+        url = reverse("order-detail", kwargs={"pk": self.order_1.id})
+        payload = {"status": "completed"}
+        self.user_client_1.logout()
+        response = self.user_client_1.patch(url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_order_detail_patch_403(self):
+        url = reverse("order-detail", kwargs={"pk": self.order_1.id})
+        payload = {"status": "completed"}
+        response = self.user_client_2.patch(url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_order_detail_patch_404(self):
+        url = reverse("order-detail", kwargs={"pk": 999999})
+        payload = {"status": "completed"}
+        response = self.user_client_2.patch(url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_order_detail_delete_204(self):
+        url = reverse("order-detail", kwargs={"pk": self.order_1.id})
+        response = self.user_client_admin.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        with self.assertRaises(Order.DoesNotExist):
+            Order.objects.get(id=self.order_1.id)
+
+    def test_order_detail_delete_401(self):
+        url = reverse("order-detail", kwargs={"pk": self.order_1.id})
+        self.user_client_1.logout()
+        response = self.user_client_1.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_order_detail_delete_403(self):
+        url = reverse("order-detail", kwargs={"pk": self.order_1.id})
+        response = self.user_client_1.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_order_detail_delete_404(self):
+        url = reverse("order-detail", kwargs={"pk": 99999})
+        response = self.user_client_1.delete(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
