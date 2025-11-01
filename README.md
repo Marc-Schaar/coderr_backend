@@ -97,7 +97,3 @@ Data validation, error handling, and serialization
 Full integration with the frontend for a smooth user experience
 
 This project is part of the Developer Academy Backend course, providing hands-on experience in backend development and API integration.
-
----
-
-© 2025 Coderr
