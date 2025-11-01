@@ -41,8 +41,10 @@ class OrdersListView(generics.ListCreateAPIView):
         """
         offer_detail_id = self.request.data.get("offer_detail_id")
 
-        if not offer_detail_id:
-            raise NotFound("offer_detail_id ist erforderlich.")
+        try:
+            offer_detail_id = int(offer_detail_id)
+        except (TypeError, ValueError):
+            raise NotFound("offer_detail_id ist muss eine Zahl sein und darf nicht fehlen.")
 
         try:
             offer_detail = OfferDetails.objects.get(id=offer_detail_id)

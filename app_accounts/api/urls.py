@@ -12,12 +12,12 @@ urlpatterns = [
     path("login/", LoginView.as_view(), name="login-list"),
     path("profile/<int:pk>", ProfileDetailView.as_view(), name="profile-detail"),
     path(
-        "profile/business/",
+        "profiles/business/",
         ProfileBusinessListView.as_view(),
         name="profile-business-list",
     ),
     path(
-        "profile/customer/",
+        "profiles/customer/",
         ProfileCustomerListView.as_view(),
         name="profile-customer-list",
     ),
