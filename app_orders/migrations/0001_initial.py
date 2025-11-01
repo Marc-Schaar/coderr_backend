@@ -7,23 +7,33 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Order',
+            name="Order",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=100)),
-                ('price', models.IntegerField(default=0)),
-                ('image', models.ImageField(blank=True, null=True, upload_to='offers_img')),
-                ('description', models.TextField()),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('details', models.JSONField(blank=True, null=True)),
-                ('min_price', models.FloatField()),
-                ('min_delivery_time', models.IntegerField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=100)),
+                ("price", models.IntegerField(default=0)),
+                (
+                    "image",
+                    models.ImageField(blank=True, null=True, upload_to="offers_img"),
+                ),
+                ("description", models.TextField()),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("details", models.JSONField(blank=True, null=True)),
+                ("min_price", models.FloatField()),
+                ("min_delivery_time", models.IntegerField()),
             ],
         ),
     ]

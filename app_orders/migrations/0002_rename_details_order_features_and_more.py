@@ -8,65 +8,94 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('app_orders', '0001_initial'),
+        ("app_orders", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='order',
-            old_name='details',
-            new_name='features',
+            model_name="order",
+            old_name="details",
+            new_name="features",
         ),
         migrations.RenameField(
-            model_name='order',
-            old_name='min_delivery_time',
-            new_name='revisions',
+            model_name="order",
+            old_name="min_delivery_time",
+            new_name="revisions",
         ),
         migrations.RemoveField(
-            model_name='order',
-            name='description',
+            model_name="order",
+            name="description",
         ),
         migrations.RemoveField(
-            model_name='order',
-            name='image',
+            model_name="order",
+            name="image",
         ),
         migrations.RemoveField(
-            model_name='order',
-            name='min_price',
+            model_name="order",
+            name="min_price",
         ),
         migrations.RemoveField(
-            model_name='order',
-            name='title',
+            model_name="order",
+            name="title",
         ),
         migrations.AddField(
-            model_name='order',
-            name='business_user',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='business_orders', to=settings.AUTH_USER_MODEL),
+            model_name="order",
+            name="business_user",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="business_orders",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='order',
-            name='customer_user',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='customer_orders', to=settings.AUTH_USER_MODEL),
+            model_name="order",
+            name="customer_user",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="customer_orders",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='order',
-            name='delivery_time_in_days',
+            model_name="order",
+            name="delivery_time_in_days",
             field=models.IntegerField(null=True),
         ),
         migrations.AddField(
-            model_name='order',
-            name='offer_type',
-            field=models.CharField(choices=[('basic', 'Basic'), ('standard', 'Standard'), ('premium', 'Premium')], default='basic', max_length=10),
+            model_name="order",
+            name="offer_type",
+            field=models.CharField(
+                choices=[
+                    ("basic", "Basic"),
+                    ("standard", "Standard"),
+                    ("premium", "Premium"),
+                ],
+                default="basic",
+                max_length=10,
+            ),
         ),
         migrations.AddField(
-            model_name='order',
-            name='status',
-            field=models.CharField(choices=[('pending', 'Pending'), ('in_progress', 'In Progress'), ('completed', 'Completed'), ('cancelled', 'Cancelled')], default='pending', max_length=15),
+            model_name="order",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("pending", "Pending"),
+                    ("in_progress", "In Progress"),
+                    ("completed", "Completed"),
+                    ("cancelled", "Cancelled"),
+                ],
+                default="pending",
+                max_length=15,
+            ),
         ),
         migrations.AlterField(
-            model_name='order',
-            name='price',
+            model_name="order",
+            name="price",
             field=models.DecimalField(decimal_places=2, max_digits=10),
         ),
     ]

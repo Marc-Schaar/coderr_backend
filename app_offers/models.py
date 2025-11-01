@@ -17,7 +17,7 @@ class Offer(models.Model):
 
 
 class OfferDetails(models.Model):
-    offer = models.ForeignKey(Offer, on_delete=models.CASCADE, related_name='details')
+    offer = models.ForeignKey(Offer, on_delete=models.CASCADE, related_name="details")
     title = models.CharField(blank=False, max_length=100)
     revisions = models.IntegerField(blank=False)
     delivery_time_in_days = models.IntegerField(blank=False)

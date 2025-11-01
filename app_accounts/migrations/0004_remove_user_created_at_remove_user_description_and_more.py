@@ -8,55 +8,77 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('app_accounts', '0003_user_working_hours'),
+        ("app_accounts", "0003_user_working_hours"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='user',
-            name='created_at',
+            model_name="user",
+            name="created_at",
         ),
         migrations.RemoveField(
-            model_name='user',
-            name='description',
+            model_name="user",
+            name="description",
         ),
         migrations.RemoveField(
-            model_name='user',
-            name='file',
+            model_name="user",
+            name="file",
         ),
         migrations.RemoveField(
-            model_name='user',
-            name='location',
+            model_name="user",
+            name="location",
         ),
         migrations.RemoveField(
-            model_name='user',
-            name='tel',
+            model_name="user",
+            name="tel",
         ),
         migrations.RemoveField(
-            model_name='user',
-            name='working_hours',
+            model_name="user",
+            name="working_hours",
         ),
         migrations.AlterField(
-            model_name='user',
-            name='first_name',
-            field=models.CharField(blank=True, max_length=150, verbose_name='first name'),
+            model_name="user",
+            name="first_name",
+            field=models.CharField(
+                blank=True, max_length=150, verbose_name="first name"
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='last_name',
-            field=models.CharField(blank=True, max_length=150, verbose_name='last name'),
+            model_name="user",
+            name="last_name",
+            field=models.CharField(
+                blank=True, max_length=150, verbose_name="last name"
+            ),
         ),
         migrations.CreateModel(
-            name='Profile',
+            name="Profile",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('file', models.FileField(blank=True, null=True, upload_to='user_files/')),
-                ('location', models.CharField(blank=True, max_length=100)),
-                ('tel', models.CharField(blank=True, max_length=15)),
-                ('description', models.TextField(blank=True)),
-                ('working_hours', models.CharField(blank=True, max_length=50)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='profile', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "file",
+                    models.FileField(blank=True, null=True, upload_to="user_files/"),
+                ),
+                ("location", models.CharField(blank=True, max_length=100)),
+                ("tel", models.CharField(blank=True, max_length=15)),
+                ("description", models.TextField(blank=True)),
+                ("working_hours", models.CharField(blank=True, max_length=50)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="profile",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]

@@ -9,9 +9,12 @@ class OfferFilter(django_filters.FilterSet):
     FilterSet for filtering offers by creator, minimum price, and maximum delivery time.
     Includes validation to ensure the creator exists.
     """
-    creator_id = django_filters.NumberFilter(method='filter_creator_id')
-    min_price = django_filters.NumberFilter(field_name="min_price", lookup_expr='gte')
-    max_delivery_time = django_filters.NumberFilter(field_name="min_delivery_time", lookup_expr='lte')
+
+    creator_id = django_filters.NumberFilter(method="filter_creator_id")
+    min_price = django_filters.NumberFilter(field_name="min_price", lookup_expr="gte")
+    max_delivery_time = django_filters.NumberFilter(
+        field_name="min_delivery_time", lookup_expr="lte"
+    )
 
     class Meta:
         model = Offer

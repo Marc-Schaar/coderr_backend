@@ -8,22 +8,19 @@ class ReviewSerializer(serializers.ModelSerializer):
     Handles serialization and deserialization of review data, including all relevant fields.
     Most fields are read-only to ensure data integrity after review creation.
     """
+
     class Meta:
         model = Review
         fields = [
-            'id',
-            'reviewer',
-            'business_user',
-            'rating',
-            'description',
-            'created_at',
-            'updated_at'
+            "id",
+            "reviewer",
+            "business_user",
+            "rating",
+            "description",
+            "created_at",
+            "updated_at",
         ]
-        read_only_fields = [
-            'id',
-            'reviewer',
-            'created_at',
-            'updated_at']
+        read_only_fields = ["id", "reviewer", "created_at", "updated_at"]
 
 
 class ReviewDetailSerializer(serializers.ModelSerializer):
@@ -31,22 +28,19 @@ class ReviewDetailSerializer(serializers.ModelSerializer):
     Serializer for detailed review view.
     Ensures certain fields are read-only and validates that only allowed fields are updated.
     """
+
     class Meta:
         model = Review
         fields = [
-            'id',
-            'business_user',
-            'reviewer',
-            'rating',
-            'description',
-            'created_at',
-            'updated_at'
+            "id",
+            "business_user",
+            "reviewer",
+            "rating",
+            "description",
+            "created_at",
+            "updated_at",
         ]
-        read_only_fields = [
-            'business_user',
-            'reviewer',
-            'created_at',
-            'updated_at']
+        read_only_fields = ["business_user", "reviewer", "created_at", "updated_at"]
 
     def validate(self, data):
         """

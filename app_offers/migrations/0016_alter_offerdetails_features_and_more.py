@@ -6,18 +6,21 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('app_offers', '0015_alter_offer_min_delivery_time_alter_offer_min_price_and_more'),
+        (
+            "app_offers",
+            "0015_alter_offer_min_delivery_time_alter_offer_min_price_and_more",
+        ),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='offerdetails',
-            name='features',
+            model_name="offerdetails",
+            name="features",
             field=models.JSONField(),
         ),
         migrations.AlterField(
-            model_name='offerdetails',
-            name='offer_type',
+            model_name="offerdetails",
+            name="offer_type",
             field=models.CharField(max_length=50),
         ),
     ]

@@ -3,22 +3,37 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient, APITestCase
 
-from app_accounts.models import User,Profile
+from app_accounts.models import User, Profile
 from app_accounts.api.serializers import ProfileDetailSerializer, ProfileListSerializer
+
 
 class TestProfiles(APITestCase):
     def setUp(self):
-        self.user_1 = User.objects.create_user(username="max_mustermann", password="examplePassword", email="test@test.de", type="business")
-        self.user_2 = User.objects.create_user(username="exampleUsername_2",  password="examplePassword", email="email2est,de", type="customer")
+        self.user_1 = User.objects.create_user(
+            username="max_mustermann",
+            password="examplePassword",
+            email="test@test.de",
+            type="business",
+        )
+        self.user_2 = User.objects.create_user(
+            username="exampleUsername_2",
+            password="examplePassword",
+            email="email2est,de",
+            type="customer",
+        )
 
         self.token_user_1 = Token.objects.create(user=self.user_1)
         self.token_user_2 = Token.objects.create(user=self.user_2)
 
         self.user_client_1 = APIClient()
-        self.user_client_1.credentials(HTTP_AUTHORIZATION="Token " + self.token_user_1.key)
+        self.user_client_1.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_user_1.key
+        )
 
         self.user_client_2 = APIClient()
-        self.user_client_2.credentials(HTTP_AUTHORIZATION="Token " + self.token_user_2.key)
+        self.user_client_2.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_user_2.key
+        )
 
     def test_profiles_get_200(self):
         url = reverse("profile-detail", kwargs={"pk": 1})
@@ -49,19 +64,21 @@ class TestProfiles(APITestCase):
             "tel": "987654321",
             "description": "Updated business description",
             "working_hours": "10-18",
-            "email": "new_email@business.de"
+            "email": "new_email@business.de",
         }
 
         response = self.user_client_1.patch(url, payload, format="json")
-        self.user_1.refresh_from_db()   
-        self.user_1.profile.refresh_from_db() 
+        self.user_1.refresh_from_db()
+        self.user_1.profile.refresh_from_db()
         expected_data = ProfileDetailSerializer(self.user_1.profile).data
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertJSONEqual(response.content, expected_data)
         self.assertEqual(self.user_1.profile.location, "Berlin")
         self.assertEqual(self.user_1.profile.tel, "987654321")
-        self.assertEqual(self.user_1.profile.description, "Updated business description")
+        self.assertEqual(
+            self.user_1.profile.description, "Updated business description"
+        )
         self.assertEqual(self.user_1.profile.working_hours, "10-18")
         self.assertEqual(self.user_1.first_name, "Max")
         self.assertEqual(self.user_1.last_name, "Mustermann")
@@ -75,7 +92,7 @@ class TestProfiles(APITestCase):
         self.user_client_1.logout()
         response = self.user_client_1.patch(url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-    
+
     def test_profile_detail_patch_403(self):
         url = reverse("profile-detail", kwargs={"pk": 1})
         payload = {
@@ -83,7 +100,7 @@ class TestProfiles(APITestCase):
         }
         response = self.user_client_2.patch(url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-    
+
     def test_profile_detail_patch_404(self):
         url = reverse("profile-detail", kwargs={"pk": 999999})
         payload = {
@@ -93,7 +110,9 @@ class TestProfiles(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_profile_get_business_list_200(self):
-        url = reverse("profile-business-list",)
+        url = reverse(
+            "profile-business-list",
+        )
         response = self.user_client_1.get(url, format="json")
         expected_data = ProfileListSerializer(
             Profile.objects.filter(user__type="business"), many=True
@@ -103,13 +122,15 @@ class TestProfiles(APITestCase):
         self.assertListEqual(response.json(), expected_data)
 
     def test_profile_get_business_list_401(self):
-        url= reverse("profile-business-list")
+        url = reverse("profile-business-list")
         self.user_client_1.logout()
         response = self.user_client_1.get(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_profile_get_customer_list_200(self):   
-        url = reverse("profile-customer-list",)
+    def test_profile_get_customer_list_200(self):
+        url = reverse(
+            "profile-customer-list",
+        )
         response = self.user_client_1.get(url, format="json")
         expected_data = ProfileListSerializer(
             Profile.objects.filter(user__type="customer"), many=True
@@ -118,18 +139,7 @@ class TestProfiles(APITestCase):
         self.assertListEqual(response.json(), expected_data)
 
     def test_profile_get_business_list_401(self):
-        url= reverse("profile-customer-list")
+        url = reverse("profile-customer-list")
         self.user_client_1.logout()
         response = self.user_client_1.get(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-
-
-
-
-
-
-
-      
-
-       

@@ -6,18 +6,21 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('app_accounts', '0004_remove_user_created_at_remove_user_description_and_more'),
+        (
+            "app_accounts",
+            "0004_remove_user_created_at_remove_user_description_and_more",
+        ),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='profile',
-            name='first_name',
+            model_name="profile",
+            name="first_name",
             field=models.CharField(blank=True, max_length=30),
         ),
         migrations.AddField(
-            model_name='profile',
-            name='last_name',
+            model_name="profile",
+            name="last_name",
             field=models.CharField(blank=True, max_length=30),
         ),
     ]

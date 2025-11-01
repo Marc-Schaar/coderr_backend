@@ -7,25 +7,40 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('app_offers', '0011_alter_offer_min_delivery_time_alter_offer_min_price'),
+        ("app_offers", "0011_alter_offer_min_delivery_time_alter_offer_min_price"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='offer',
-            name='details',
+            model_name="offer",
+            name="details",
         ),
         migrations.CreateModel(
-            name='OfferDetails',
+            name="OfferDetails",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=100)),
-                ('revisons', models.IntegerField()),
-                ('delivery_time_in_days', models.IntegerField()),
-                ('price', models.FloatField()),
-                ('features', models.JSONField(blank=True, null=True)),
-                ('offer_type', models.CharField(blank=True, max_length=50, null=True)),
-                ('offer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='details', to='app_offers.offer')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=100)),
+                ("revisons", models.IntegerField()),
+                ("delivery_time_in_days", models.IntegerField()),
+                ("price", models.FloatField()),
+                ("features", models.JSONField(blank=True, null=True)),
+                ("offer_type", models.CharField(blank=True, max_length=50, null=True)),
+                (
+                    "offer",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="details",
+                        to="app_offers.offer",
+                    ),
+                ),
             ],
         ),
     ]

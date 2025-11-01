@@ -6,13 +6,21 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('app_orders', '0004_order_title_alter_order_price'),
+        ("app_orders", "0004_order_title_alter_order_price"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='order',
-            name='status',
-            field=models.CharField(choices=[('in_progress', 'In Progress'), ('completed', 'Completed'), ('cancelled', 'Cancelled')], default='pending', max_length=15),
+            model_name="order",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("in_progress", "In Progress"),
+                    ("completed", "Completed"),
+                    ("cancelled", "Cancelled"),
+                ],
+                default="pending",
+                max_length=15,
+            ),
         ),
     ]

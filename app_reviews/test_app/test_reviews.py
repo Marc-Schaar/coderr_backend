@@ -10,40 +10,88 @@ from app_reviews.models import Review
 class TestProfiles(APITestCase):
     def setUp(self):
         self.user_1 = User.objects.create_user(
-            username="jdoe", password="examplePassword", email="test@test.de", type="customer", first_name="John", last_name="Doe")
+            username="jdoe",
+            password="examplePassword",
+            email="test@test.de",
+            type="customer",
+            first_name="John",
+            last_name="Doe",
+        )
         self.token_user_1 = Token.objects.create(user=self.user_1)
         self.user_client_1 = APIClient()
-        self.user_client_1.credentials(HTTP_AUTHORIZATION="Token " + self.token_user_1.key)
+        self.user_client_1.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_user_1.key
+        )
 
         self.user_2 = User.objects.create_user(
-            username="mschaar", password="examplePassword", email="test2@test.de", type="business", first_name="Marc", last_name="Schaar")
+            username="mschaar",
+            password="examplePassword",
+            email="test2@test.de",
+            type="business",
+            first_name="Marc",
+            last_name="Schaar",
+        )
         self.token_user_2 = Token.objects.create(user=self.user_2)
         self.user_client_2 = APIClient()
-        self.user_client_2.credentials(HTTP_AUTHORIZATION="Token " + self.token_user_2.key)
+        self.user_client_2.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_user_2.key
+        )
 
         self.user_3 = User.objects.create_user(
-            username="user3", password="examplePassword", email="test3@test.de", type="customer", first_name="Marc", last_name="Schaar")
+            username="user3",
+            password="examplePassword",
+            email="test3@test.de",
+            type="customer",
+            first_name="Marc",
+            last_name="Schaar",
+        )
         self.token_user_3 = Token.objects.create(user=self.user_3)
         self.user_client_3 = APIClient()
-        self.user_client_3.credentials(HTTP_AUTHORIZATION="Token " + self.token_user_3.key)
+        self.user_client_3.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_user_3.key
+        )
 
         self.user_4 = User.objects.create_user(
-            username="user4", password="examplePassword", email="test4@test.de", type="customer", first_name="Marc", last_name="Schaar")
+            username="user4",
+            password="examplePassword",
+            email="test4@test.de",
+            type="customer",
+            first_name="Marc",
+            last_name="Schaar",
+        )
         self.token_user_4 = Token.objects.create(user=self.user_4)
         self.user_client_4 = APIClient()
-        self.user_client_4.credentials(HTTP_AUTHORIZATION="Token " + self.token_user_4.key)
+        self.user_client_4.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_user_4.key
+        )
 
         self.user_5 = User.objects.create_user(
-            username="user5", password="examplePassword", email="test5@test.de", type="business", first_name="Marc", last_name="Schaar")
+            username="user5",
+            password="examplePassword",
+            email="test5@test.de",
+            type="business",
+            first_name="Marc",
+            last_name="Schaar",
+        )
         self.token_user_5 = Token.objects.create(user=self.user_5)
         self.user_client_5 = APIClient()
-        self.user_client_5.credentials(HTTP_AUTHORIZATION="Token " + self.token_user_5.key)
+        self.user_client_5.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_user_5.key
+        )
 
         self.user_6 = User.objects.create_user(
-            username="user6", password="examplePassword", email="test6@test.de", type="business", first_name="Marc", last_name="Schaar")
+            username="user6",
+            password="examplePassword",
+            email="test6@test.de",
+            type="business",
+            first_name="Marc",
+            last_name="Schaar",
+        )
         self.token_user_6 = Token.objects.create(user=self.user_6)
         self.user_client_6 = APIClient()
-        self.user_client_6.credentials(HTTP_AUTHORIZATION="Token " + self.token_user_6.key)
+        self.user_client_6.credentials(
+            HTTP_AUTHORIZATION="Token " + self.token_user_6.key
+        )
 
         self.review_1 = Review.objects.create(
             business_user=self.user_2,
@@ -84,7 +132,7 @@ class TestReviews(TestProfiles):
                 "reviewer": 3,
                 "rating": 5,
                 "description": "Top Qualität und schnelle Lieferung!",
-            }
+            },
         ]
 
         cleaned_response = [
@@ -93,15 +141,15 @@ class TestReviews(TestProfiles):
                 "business_user": r["business_user"],
                 "reviewer": r["reviewer"],
                 "rating": r["rating"],
-                "description": r["description"]
+                "description": r["description"],
             }
             for r in response_data
         ]
         self.assertEqual(cleaned_response, expected_data)
 
         for r in response_data:
-            self.assertIn('created_at', r)
-            self.assertIn('updated_at', r)
+            self.assertIn("created_at", r)
+            self.assertIn("updated_at", r)
 
     def test_offer_list_401(self):
         url = reverse("reviews-list")
@@ -133,7 +181,7 @@ class TestReviews(TestProfiles):
                 "business_user": r["business_user"],
                 "reviewer": r["reviewer"],
                 "rating": r["rating"],
-                "description": r["description"]
+                "description": r["description"],
             }
             for r in response_data
         ]
@@ -160,7 +208,7 @@ class TestReviews(TestProfiles):
                 "reviewer": 3,
                 "rating": 5,
                 "description": "Top Qualität und schnelle Lieferung!",
-            }
+            },
         ]
 
         cleaned_response = [
@@ -169,7 +217,7 @@ class TestReviews(TestProfiles):
                 "business_user": r["business_user"],
                 "reviewer": r["reviewer"],
                 "rating": r["rating"],
-                "description": r["description"]
+                "description": r["description"],
             }
             for r in response_data
         ]
@@ -196,8 +244,7 @@ class TestReviews(TestProfiles):
                 "reviewer": 3,
                 "rating": 4,
                 "description": "Sehr professioneller Service.",
-            }
-
+            },
         ]
 
         cleaned_response = [
@@ -206,34 +253,34 @@ class TestReviews(TestProfiles):
                 "business_user": r["business_user"],
                 "reviewer": r["reviewer"],
                 "rating": r["rating"],
-                "description": r["description"]
+                "description": r["description"],
             }
             for r in response_data
         ]
         self.assertEqual(cleaned_response, expected_data)
 
     def test_review_post_201(self):
-        url = reverse('reviews-list')
+        url = reverse("reviews-list")
         payload = {
             "business_user": self.user_6.id,
             "rating": 4,
-            "description": "Alles war toll!"
+            "description": "Alles war toll!",
         }
 
         response = self.user_client_3.post(url, payload)
         response_data = response.json()
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response_data['id'], 3)
-        self.assertEqual(response_data['business_user'], 6)
-        self.assertEqual(response_data['reviewer'], 3)
-        self.assertEqual(response_data['rating'], 4)
-        self.assertEqual(response_data['description'], "Alles war toll!")
-        self.assertIn('created_at', response_data)
-        self.assertIn('updated_at', response_data)
+        self.assertEqual(response_data["id"], 3)
+        self.assertEqual(response_data["business_user"], 6)
+        self.assertEqual(response_data["reviewer"], 3)
+        self.assertEqual(response_data["rating"], 4)
+        self.assertEqual(response_data["description"], "Alles war toll!")
+        self.assertIn("created_at", response_data)
+        self.assertIn("updated_at", response_data)
 
     def test_review_post_missing_fields_400(self):
-        url = reverse('reviews-list')
+        url = reverse("reviews-list")
         missing_field_payloads = [
             {"rating": 4, "description": "Alles war toll!"},
             {"business_user": self.user_2.id, "description": "Alles war toll!"},
@@ -241,37 +288,49 @@ class TestReviews(TestProfiles):
         ]
 
         for p in missing_field_payloads:
-            response = self.user_client_3.post(url, p, format='json')
+            response = self.user_client_3.post(url, p, format="json")
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_review_post_duplicate_400(self):
-        url = reverse('reviews-list')
-        payload = {"business_user": self.user_2.id, "rating": 2, "description": "Nicht toll!"}
-        self.user_client_3.post(url, payload, format='json')
-        response = self.user_client_3.post(url, payload, format='json')
+        url = reverse("reviews-list")
+        payload = {
+            "business_user": self.user_2.id,
+            "rating": 2,
+            "description": "Nicht toll!",
+        }
+        self.user_client_3.post(url, payload, format="json")
+        response = self.user_client_3.post(url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_review_post_401(self):
-        url = reverse('reviews-list')
-        payload = {"business_user": self.user_2.id, "rating": 2, "description": "Nicht toll!"}
+        url = reverse("reviews-list")
+        payload = {
+            "business_user": self.user_2.id,
+            "rating": 2,
+            "description": "Nicht toll!",
+        }
         self.user_client_3.logout()
-        response = self.user_client_3.post(url, payload, format='json')
+        response = self.user_client_3.post(url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_review_post_403(self):
-        url = reverse('reviews-list')
-        payload = {"business_user": self.user_2.id, "rating": 2, "description": "Nicht toll!"}
-        response = self.user_client_6.post(url, payload, format='json')
+        url = reverse("reviews-list")
+        payload = {
+            "business_user": self.user_2.id,
+            "rating": 2,
+            "description": "Nicht toll!",
+        }
+        response = self.user_client_6.post(url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_review_patch_200(self):
-        url = reverse('reviews-detail', kwargs={"pk": self.review_1.id})
+        url = reverse("reviews-detail", kwargs={"pk": self.review_1.id})
         payloads = [
             {"rating": 1},
             {"description": "Sehr  unprofessioneller Service."},
         ]
         for payload in payloads:
-            response = self.user_client_3.patch(url, payload, format='json')
+            response = self.user_client_3.patch(url, payload, format="json")
             self.assertEqual(response.status_code, status.HTTP_200_OK)
 
             self.review_1.refresh_from_db()
@@ -280,57 +339,56 @@ class TestReviews(TestProfiles):
                 self.assertEqual(getattr(self.review_1, key), value)
 
     def test_review_patch_400(self):
-        url = reverse('reviews-detail', kwargs={"pk": self.review_1.id})
+        url = reverse("reviews-detail", kwargs={"pk": self.review_1.id})
         invalid_payloads = [
             {"business_user": 1},
             {"reviewer": 3},
             {"created_at": "2024-01-01T00:00:00Z"},
             {"updated_at": "2024-01-01T00:00:00Z"},
-
         ]
         for payload in invalid_payloads:
-            response = self.user_client_3.patch(url, payload, format='json')
+            response = self.user_client_3.patch(url, payload, format="json")
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_review_patch_401(self):
-        url = reverse('reviews-detail', kwargs={"pk": self.review_1.id})
-        payload = {"business_user": 1},
+        url = reverse("reviews-detail", kwargs={"pk": self.review_1.id})
+        payload = ({"business_user": 1},)
         self.user_client_3.logout()
 
-        response = self.user_client_3.patch(url, payload, format='json')
+        response = self.user_client_3.patch(url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_review_patch_403(self):
-        url = reverse('reviews-detail', kwargs={"pk": self.review_1.id})
+        url = reverse("reviews-detail", kwargs={"pk": self.review_1.id})
         payload = {"rating": 1}
 
-        response = self.user_client_1.patch(url, payload, format='json')
+        response = self.user_client_1.patch(url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_review_patch_404(self):
-        url = reverse('reviews-detail', kwargs={"pk": 999999})
+        url = reverse("reviews-detail", kwargs={"pk": 999999})
         payload = {"rating": 1}
 
-        response = self.user_client_1.patch(url, payload, format='json')
+        response = self.user_client_1.patch(url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_review_delete_200(self):
-        url = reverse('reviews-detail', kwargs={"pk": self.review_1.id})
-        response = self.user_client_3.delete(url, format='json')
+        url = reverse("reviews-detail", kwargs={"pk": self.review_1.id})
+        response = self.user_client_3.delete(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_review_delete_401(self):
-        url = reverse('reviews-detail', kwargs={"pk": self.review_1.id})
+        url = reverse("reviews-detail", kwargs={"pk": self.review_1.id})
         self.user_client_3.logout()
-        response = self.user_client_3.delete(url,  format='json')
+        response = self.user_client_3.delete(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_review_delete_403(self):
-        url = reverse('reviews-detail', kwargs={"pk": self.review_1.id})
-        response = self.user_client_1.delete(url, format='json')
+        url = reverse("reviews-detail", kwargs={"pk": self.review_1.id})
+        response = self.user_client_1.delete(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_review_delete_404(self):
-        url = reverse('reviews-detail', kwargs={"pk": 999999})
-        response = self.user_client_1.delete(url, format='json')
+        url = reverse("reviews-detail", kwargs={"pk": 999999})
+        response = self.user_client_1.delete(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

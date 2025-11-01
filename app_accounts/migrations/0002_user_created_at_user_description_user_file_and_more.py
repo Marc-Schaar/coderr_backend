@@ -7,44 +7,46 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('app_accounts', '0001_initial'),
+        ("app_accounts", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+            model_name="user",
+            name="created_at",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='user',
-            name='description',
+            model_name="user",
+            name="description",
             field=models.CharField(blank=True),
         ),
         migrations.AddField(
-            model_name='user',
-            name='file',
-            field=models.FileField(blank=True, null=True, upload_to='user_files/'),
+            model_name="user",
+            name="file",
+            field=models.FileField(blank=True, null=True, upload_to="user_files/"),
         ),
         migrations.AddField(
-            model_name='user',
-            name='location',
+            model_name="user",
+            name="location",
             field=models.CharField(blank=True, max_length=100),
         ),
         migrations.AddField(
-            model_name='user',
-            name='tel',
+            model_name="user",
+            name="tel",
             field=models.CharField(blank=True, max_length=15),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='first_name',
+            model_name="user",
+            name="first_name",
             field=models.CharField(blank=True, max_length=30),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='last_name',
+            model_name="user",
+            name="last_name",
             field=models.CharField(blank=True, max_length=30),
         ),
     ]
