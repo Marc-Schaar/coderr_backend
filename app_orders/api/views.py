@@ -1,7 +1,8 @@
 from rest_framework import generics
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
-
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from app_orders.models import Order
 from app_offers.models import OfferDetails
 from .serializers import OrderSerializer
@@ -50,3 +51,21 @@ class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = OrderSerializer
     lookup_field = 'pk'
     permission_classes = [IsAuthenticated, IsAdminUserToDeleteOnly, IsBusinessUserOrReadOnly]
+
+
+class OrderCountView(APIView):
+    queryset = Order.objects.all()
+    completed = False
+    order_count = 0
+
+    def get_order_count(self, business_user_id: int) -> int:
+        status_filter = 'completed' if self.completed else 'in_progress'
+        return Order.objects.filter(business_user_id=business_user_id, status=status_filter).count()
+            
+    def get(self, request, pk = None):
+        if not Order.objects.filter(business_user__id=pk).exists():
+            return Response({"error": "No orders found for the given business user ID."}, status=404)
+
+        count = self.get_order_count(pk)
+        key = "completed_order_count" if self.completed else "order_count"
+        return Response({key: count})

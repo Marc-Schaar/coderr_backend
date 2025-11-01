@@ -222,3 +222,42 @@ class TestOrders(APITestCase):
         url = reverse("order-detail", kwargs={"pk": 99999})
         response = self.user_client_1.delete(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_order_count_view_200(self):
+        url = reverse("order-count", kwargs={"pk": self.user_1.id})
+        response = self.user_client_1.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response_data = response.json()
+        self.assertIn("order_count", response_data)
+        self.assertEqual(response_data["order_count"], 2)
+
+    def test_order_count_view_401(self):
+        url = reverse("order-count", kwargs={"pk": self.user_1.id})
+        self.user_client_1.logout()
+        response = self.user_client_1.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+    
+    def test_order_count_view_404(self):
+        url = reverse("order-count", kwargs={"pk": self.user_2.id})
+        response = self.user_client_1.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_completed_order_count_view_200(self):
+        url = reverse("completed-order-count", kwargs={"pk": self.user_1.id})
+        response = self.user_client_1.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_data = response.json()
+        self.assertIn("completed_order_count", response_data)
+        self.assertEqual(response_data["completed_order_count"], 1)
+    
+    def test_completed_order_count_view_401(self):
+        url = reverse("completed-order-count", kwargs={"pk": self.user_1.id})
+        self.user_client_1.logout()
+        response = self.user_client_1.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_completed_order_count_view_404(self):
+        url = reverse("completed-order-count", kwargs={"pk": self.user_2.id})
+        response = self.user_client_1.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
