@@ -1,4 +1,4 @@
-#  ![Coderr Logo](assets/icons/logo_coderr.svg)  Coderr Backend API
+#  ![Coderr Logo](assets/icons/logo_coderr.svg)  Backend API
 
 This is a RESTful API backend for the Coderr platform, built with Django and Django REST Framework (DRF).
 It supports user registration, authentication, business and customer profiles, offers, orders, and reviews for a service marketplace.
