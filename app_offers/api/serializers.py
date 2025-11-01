@@ -5,12 +5,19 @@ from app_accounts.api.serializers import UserListSerializer
 
 
 class OfferDetailsSerializer(serializers.ModelSerializer):
+    """
+    Serializer for offer details, including title, revisions, delivery time, price, features, and offer type.
+    """
     class Meta:
         model = OfferDetails
         fields = ['id', 'title', 'revisions', 'delivery_time_in_days', 'price', 'features', 'offer_type']
 
 
 class OfferListSerializer(serializers.ModelSerializer):
+    """
+    Serializer for listing offers with user, details, and user details.
+    Includes a method to generate detail URLs for each offer detail.
+    """
     user = serializers.PrimaryKeyRelatedField(read_only=True)
     details = serializers.SerializerMethodField()
     user_details = UserListSerializer(source='user', read_only=True)
@@ -32,6 +39,9 @@ class OfferListSerializer(serializers.ModelSerializer):
         ]
 
     def get_details(self, obj):
+        """
+        Returns a list of offer detail objects with their API URLs for the given offer.
+        """
         request = self.context.get('request')
         details = obj.details.all()
 
@@ -45,6 +55,10 @@ class OfferListSerializer(serializers.ModelSerializer):
 
 
 class OfferCreateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for creating offers with nested offer details.
+    Validates that at least three offer details are provided and creates related details.
+    """
     details = OfferDetailsSerializer(many=True)
 
     class Meta:
@@ -58,12 +72,18 @@ class OfferCreateSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
+        """
+        Validates that at least three offer details are provided.
+        """
         details = attrs.get('details', [])
         if len(details) < 3:
             raise serializers.ValidationError("At least three offer detail is required.")
         return attrs
 
     def create(self, validated_data):
+        """
+        Creates an offer and its related offer details, updating min price and delivery time.
+        """
         details_data = validated_data.pop('details', [])
         offer = Offer.objects.create(**validated_data)
 
@@ -82,6 +102,10 @@ class OfferCreateSerializer(serializers.ModelSerializer):
 
 
 class OfferUpdateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for updating offers and their related offer details.
+    Updates offer fields and synchronizes related details.
+    """
     details = OfferDetailsSerializer(many=True)
 
     class Meta:
@@ -95,6 +119,9 @@ class OfferUpdateSerializer(serializers.ModelSerializer):
         ]
 
     def update(self, instance, validated_data):
+        """
+        Updates the offer instance and its related offer details.
+        """
         details_data = validated_data.pop('details', [])
 
         for key, value in validated_data.items():
@@ -120,6 +147,9 @@ class OfferUpdateSerializer(serializers.ModelSerializer):
 
 
 class OfferDetailSerializer(serializers.ModelSerializer):
+    """
+    Serializer for detailed offer view, including all offer fields and related details with URLs.
+    """
     details = serializers.SerializerMethodField()
 
     class Meta:
@@ -138,6 +168,9 @@ class OfferDetailSerializer(serializers.ModelSerializer):
         ]
 
     def get_details(self, obj):
+        """
+        Returns a list of offer detail objects with their API URLs for the given offer.
+        """
         request = self.context.get('request')
         details = obj.details.all()
 

@@ -12,12 +12,20 @@ from .filters import OfferFilter
 
 
 class CustomPagination(PageNumberPagination):
+    """
+    Custom pagination class for offers.
+    Sets default page size and allows client to set page size up to a maximum.
+    """
     page_size = 6
     page_size_query_param = 'page_size'
     max_page_size = 100
 
 
 class OfferView(generics.ListCreateAPIView):
+    """
+    API view for listing all offers and creating new offers.
+    Supports filtering, searching, ordering, and pagination. Only authenticated business users can create offers.
+    """
     queryset = Offer.objects.all()
     pagination_class = CustomPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -37,6 +45,10 @@ class OfferView(generics.ListCreateAPIView):
 
 
 class OfferDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    API view for retrieving, updating, or deleting a specific offer.
+    Only the owner can update or delete the offer. Uses the offer's primary key for lookup.
+    """
     queryset = Offer.objects.all()
     lookup_field = 'pk'
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
@@ -46,6 +58,9 @@ class OfferDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class OfferDetailDetailView(generics.RetrieveAPIView):
+    """
+    API view for retrieving the details of a specific offer detail object by primary key.
+    """
     queryset = OfferDetails.objects.all()
     serializer_class = OfferDetailsSerializer
     lookup_field = 'pk'
