@@ -24,7 +24,7 @@ It supports user registration, authentication, business and customer profiles, o
 Clone the repository:
 
 ```bash
-git clone <https://github.com/Marc-Schaar/coderr_backend.git>
+git clone https://github.com/Marc-Schaar/coderr_backend.git
 cd coderr_backend
 ```
 
