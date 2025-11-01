@@ -14,20 +14,37 @@ from .permissions import IsOwnerOrReadOnly
 
 
 class ProfileDetailView(generics.RetrieveUpdateAPIView):
+    """
+    API view for retrieving and updating a user profile.
+    Uses the primary key for lookup and restricts updates to the profile owner.
+    """
     queryset= Profile.objects.all()
     serializer_class = ProfileDetailSerializer
     lookup_field = "pk"
     permission_classes = [IsOwnerOrReadOnly]
 
 class ProfileBusinessListView(generics.ListAPIView):
+    """
+    API view for listing all business user profiles.
+    Returns a list of profiles where the user type is 'business'.
+    """
     queryset= Profile.objects.filter(user__type="business")
     serializer_class = ProfileListSerializer
 
 class ProfileCustomerListView(generics.ListAPIView):
+    """
+    API view for listing all customer user profiles.
+    Returns a list of profiles where the user type is 'customer'.
+    """
     queryset= Profile.objects.filter(user__type="customer")
     serializer_class = ProfileListSerializer
 
 class LoginView(ObtainAuthToken):
+    """
+    API endpoint for user authentication.
+    Accepts username and password, authenticates the user, and returns an authentication token on success.
+    Returns error messages for invalid credentials or non-existent usernames.
+    """
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -61,12 +78,9 @@ class LoginView(ObtainAuthToken):
 
 class RegesistrationView(APIView):
     """
-    User registration endpoint.
-
-    POST:
-        Registers a new user using the RegistrationSerializer.
-        On success, returns the created user's info and auth token.
-        On failure, returns validation errors.
+    API endpoint for user registration.
+    Accepts user data, validates and creates a new user, and returns an authentication token on success.
+    Returns error messages for invalid or incomplete registration data.
     """
     permission_classes = [AllowAny]
     serializer_class = UserSerializer
