@@ -91,8 +91,6 @@ class TestProfiles(APITestCase):
         }
         response = self.user_client_1.patch(url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
- 
- # Uploadet_at muss noch getestet werden sobald der Fileupload geht
 
     def test_profile_get_business_list_200(self):
         url = reverse("profile-business-list",)
@@ -110,7 +108,6 @@ class TestProfiles(APITestCase):
         response = self.user_client_1.get(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-# Uploadet_at muss noch getestet werden sobald der Fileupload geht
     def test_profile_get_customer_list_200(self):   
         url = reverse("profile-customer-list",)
         response = self.user_client_1.get(url, format="json")
