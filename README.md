@@ -80,7 +80,23 @@ Authorization: Token <your_token>
 - Filtering and searching are available for offers and reviews.
 
 ## About
-This project provides the backend for a service marketplace platform, supporting business and customer interactions, offers, orders, and reviews.
+Coderr is the backend for a freelancer developer platform. The frontend has already been developed, and your task is to implement the backend with all necessary functionality and connect it seamlessly to the existing frontend.
+
+Features
+
+RESTful APIs with Django & Django REST Framework
+
+User authentication and permissions
+
+Project, task, and profile management
+
+File uploads and media handling
+
+Data validation, error handling, and serialization
+
+Full integration with the frontend for a smooth user experience
+
+This project is part of the Developer Academy Backend course, providing hands-on experience in backend development and API integration.
 
 ---
 
