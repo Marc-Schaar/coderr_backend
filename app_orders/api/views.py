@@ -1,5 +1,5 @@
 from rest_framework import generics
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -44,7 +44,9 @@ class OrdersListView(generics.ListCreateAPIView):
         try:
             offer_detail_id = int(offer_detail_id)
         except (TypeError, ValueError):
-            raise NotFound("offer_detail_id ist muss eine Zahl sein und darf nicht fehlen.")
+            raise ValidationError(
+                "offer_detail_id ist muss eine Zahl sein und darf nicht fehlen."
+            )
 
         try:
             offer_detail = OfferDetails.objects.get(id=offer_detail_id)
