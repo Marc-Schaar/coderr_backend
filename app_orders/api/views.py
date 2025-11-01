@@ -10,10 +10,17 @@ from .permissions import IsCustomerUserOrReadOnly, IsBusinessUserOrReadOnly, IsA
 
 
 class OrdersListView(generics.ListCreateAPIView):
+    """
+    API view for listing all orders for the authenticated user and creating new orders.
+    Business users see their received orders, customers see their placed orders. Only customers can create orders.
+    """
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated, IsCustomerUserOrReadOnly]
 
     def get_queryset(self):
+        """
+        Returns the queryset of orders for the current user, filtered by user type.
+        """
         user = self.request.user
         if user.type == "business":
             return Order.objects.filter(business_user=user)
@@ -23,6 +30,10 @@ class OrdersListView(generics.ListCreateAPIView):
         return Order.objects.none()
 
     def perform_create(self, serializer):
+        """
+        Creates a new order based on the provided offer_detail_id and request user.
+        Raises NotFound if the offer detail does not exist or is missing.
+        """
         offer_detail_id = self.request.data.get("offer_detail_id")
 
         if not offer_detail_id:
@@ -47,6 +58,10 @@ class OrdersListView(generics.ListCreateAPIView):
 
 
 class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    API view for retrieving, updating, or deleting a specific order by primary key.
+    Only admins can delete, business users can update, and all authenticated users can view.
+    """
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     lookup_field = 'pk'
@@ -54,15 +69,25 @@ class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class OrderCountView(APIView):
+    """
+    API view for retrieving the count of orders for a business user.
+    Returns either the count of completed or in-progress orders, depending on the view's state.
+    """
     queryset = Order.objects.all()
     completed = False
     order_count = 0
 
     def get_order_count(self, business_user_id: int) -> int:
+        """
+        Returns the count of orders for a business user filtered by status (completed or in_progress).
+        """
         status_filter = 'completed' if self.completed else 'in_progress'
         return Order.objects.filter(business_user_id=business_user_id, status=status_filter).count()
             
     def get(self, request, pk = None):
+        """
+        Returns the order count for the given business user ID, or an error if no orders are found.
+        """
         if not Order.objects.filter(business_user__id=pk).exists():
             return Response({"error": "No orders found for the given business user ID."}, status=404)
 

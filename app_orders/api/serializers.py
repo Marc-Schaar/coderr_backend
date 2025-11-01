@@ -3,7 +3,11 @@ from app_orders.models import Order
 
 
 class OrderSerializer(serializers.ModelSerializer):
-
+    """
+    Serializer for the Order model.
+    Handles serialization and deserialization of order data, including all relevant fields.
+    Most fields are read-only to ensure data integrity after order creation.
+    """
     class Meta:
         model = Order
         fields = [
