@@ -35,13 +35,19 @@ class TestProfiles(APITestCase):
             HTTP_AUTHORIZATION="Token " + self.token_user_2.key
         )
 
-    def test_profiles_get_200(self):
-        url = reverse("profile-detail", kwargs={"pk": 1})
+    def test_profile_get_200_as_business_user(self):
+        url = reverse("profile-detail", kwargs={"pk": self.user_1.id})
         response = self.user_client_1.get(url, format="json")
         expected_data = ProfileDetailSerializer(self.user_1.profile).data
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertJSONEqual(response.content, expected_data)
+        self.assertDictEqual(response.json(), expected_data)
+
+    def test_profile_get_200_as_customer_user(self):
+        url = reverse("profile-detail", kwargs={"pk": self.user_2.id})
+        response = self.user_client_2.get(url, format="json")
+        expected_data = ProfileDetailSerializer(self.user_2.profile).data
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(response.json(), expected_data)
 
     def test_profile_detail_get_401(self):
         url = reverse("profile-detail", kwargs={"pk": self.user_1.pk})
