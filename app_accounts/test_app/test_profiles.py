@@ -120,6 +120,16 @@ class TestProfiles(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertListEqual(response.json(), expected_data)
+        self.assertIn('user', response.json()[0])
+        self.assertIn('username', response.json()[0])
+        self.assertIn('first_name', response.json()[0])
+        self.assertIn('last_name', response.json()[0])
+        self.assertIn('file', response.json()[0])
+        self.assertIn('location', response.json()[0])
+        self.assertIn('tel', response.json()[0])
+        self.assertIn('description', response.json()[0])
+        self.assertIn('type', response.json()[0])
+        self.assertIn('working_hours', response.json()[0])
 
     def test_profile_get_business_list_401(self):
         url = reverse("profile-business-list")
@@ -137,6 +147,12 @@ class TestProfiles(APITestCase):
         ).data
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertListEqual(response.json(), expected_data)
+        self.assertIn('user', response.json()[0])
+        self.assertIn('username', response.json()[0])
+        self.assertIn('first_name', response.json()[0])
+        self.assertIn('last_name', response.json()[0])
+        self.assertIn('file', response.json()[0])
+        self.assertIn('type', response.json()[0])
 
     def test_profile_get_business_list_401(self):
         url = reverse("profile-customer-list")

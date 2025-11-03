@@ -52,6 +52,10 @@ class ProfileListSerializer(serializers.ModelSerializer):
             "last_name",
             "file",
             "uploaded_at",
+            "location",
+            "tel",
+            "description",
+            "working_hours",
             "type",
         ]
 
