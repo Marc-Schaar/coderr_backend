@@ -45,13 +45,13 @@ class OrdersListView(generics.ListCreateAPIView):
             offer_detail_id = int(offer_detail_id)
         except (TypeError, ValueError):
             raise ValidationError(
-                "offer_detail_id ist muss eine Zahl sein und darf nicht fehlen."
+                {"offer_detail_id": "offer_detail_id muss eine Zahl sein und darf nicht fehlen."}
             )
 
         try:
             offer_detail = OfferDetails.objects.get(id=offer_detail_id)
         except OfferDetails.DoesNotExist:
-            raise NotFound("OfferDetail wurde nicht gefunden.")
+            raise NotFound({"OfferDetail wurde nicht gefunden."})
 
         serializer.save(
             customer_user=self.request.user,

@@ -183,6 +183,7 @@ class TestOrders(APITestCase):
         for payload in invalid_payloads:
             response = self.user_client_2.post(url, payload, format="json")
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+            self.assertIsInstance(response.json(), dict)
 
     def test_order_list_post_401(self):
         url = reverse("order-list")
