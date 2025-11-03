@@ -61,8 +61,8 @@ class TestProfiles(APITestCase):
         response = self.user_client_1.get(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_profile_detail_patch_200(self):
-        url = reverse("profile-detail", kwargs={"pk": 1})
+    def test_profile_detail_patch_200_as_business_user(self):
+        url = reverse("profile-detail", kwargs={"pk": self.user_1.id})
         payload = {
             "first_name": "Max",
             "last_name": "Mustermann",
@@ -73,22 +73,76 @@ class TestProfiles(APITestCase):
             "email": "new_email@business.de",
         }
 
+        required_fields = [
+            "user",
+            "username",
+            "first_name",
+            "last_name",
+            "file",
+            "location",
+            "tel",
+            "description",
+            "working_hours",
+            "type",
+            "email",
+            "created_at",
+        ]
+
         response = self.user_client_1.patch(url, payload, format="json")
+        response_data = response.json()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        for field in required_fields:
+            self.assertIn(field, response_data)
+
         self.user_1.refresh_from_db()
         self.user_1.profile.refresh_from_db()
-        expected_data = ProfileDetailSerializer(self.user_1.profile).data
+
+        self.assertEqual(self.user_1.profile.location, payload["location"])
+        self.assertEqual(self.user_1.profile.tel, payload["tel"])
+        self.assertEqual(self.user_1.profile.description, payload["description"])
+        self.assertEqual(self.user_1.profile.working_hours, payload["working_hours"])
+        self.assertEqual(self.user_1.first_name, payload["first_name"])
+        self.assertEqual(self.user_1.last_name, payload["last_name"])
+        self.assertEqual(self.user_1.email, payload["email"])
+
+    def test_profile_detail_patch_200_as_customer_user(self):
+        url = reverse("profile-detail", kwargs={"pk": self.user_2.id})
+        payload = {}
+
+        response = self.user_client_2.patch(url, payload, format="json")
+        response_data = response.json()
+        required_fields = [
+            "user",
+            "username",
+            "first_name",
+            "last_name",
+            "file",
+            "description",
+            "working_hours",
+            "type",
+            "email",
+            "created_at",
+        ]
+
+        not_null_fields = [
+            "first_name",
+            "last_name",
+            "location",
+            "tel",
+            "description",
+            "working_hours",
+        ]
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertJSONEqual(response.content, expected_data)
-        self.assertEqual(self.user_1.profile.location, "Berlin")
-        self.assertEqual(self.user_1.profile.tel, "987654321")
-        self.assertEqual(
-            self.user_1.profile.description, "Updated business description"
-        )
-        self.assertEqual(self.user_1.profile.working_hours, "10-18")
-        self.assertEqual(self.user_1.first_name, "Max")
-        self.assertEqual(self.user_1.last_name, "Mustermann")
-        self.assertEqual(self.user_1.email, "new_email@business.de")
+
+        for field in required_fields:
+            self.assertIn(field, response_data)
+
+        for field in not_null_fields:
+            self.assertIn(field, response_data)
+            self.assertIsNotNone(response_data[field])
+            self.assertIsInstance(response_data[field], str)
 
     def test_profile_detail_patch_401(self):
         url = reverse("profile-detail", kwargs={"pk": 1})
@@ -126,16 +180,16 @@ class TestProfiles(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertListEqual(response.json(), expected_data)
-        self.assertIn('user', response.json()[0])
-        self.assertIn('username', response.json()[0])
-        self.assertIn('first_name', response.json()[0])
-        self.assertIn('last_name', response.json()[0])
-        self.assertIn('file', response.json()[0])
-        self.assertIn('location', response.json()[0])
-        self.assertIn('tel', response.json()[0])
-        self.assertIn('description', response.json()[0])
-        self.assertIn('type', response.json()[0])
-        self.assertIn('working_hours', response.json()[0])
+        self.assertIn("user", response.json()[0])
+        self.assertIn("username", response.json()[0])
+        self.assertIn("first_name", response.json()[0])
+        self.assertIn("last_name", response.json()[0])
+        self.assertIn("file", response.json()[0])
+        self.assertIn("location", response.json()[0])
+        self.assertIn("tel", response.json()[0])
+        self.assertIn("description", response.json()[0])
+        self.assertIn("type", response.json()[0])
+        self.assertIn("working_hours", response.json()[0])
 
     def test_profile_get_business_list_401(self):
         url = reverse("profile-business-list")
@@ -153,12 +207,12 @@ class TestProfiles(APITestCase):
         ).data
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertListEqual(response.json(), expected_data)
-        self.assertIn('user', response.json()[0])
-        self.assertIn('username', response.json()[0])
-        self.assertIn('first_name', response.json()[0])
-        self.assertIn('last_name', response.json()[0])
-        self.assertIn('file', response.json()[0])
-        self.assertIn('type', response.json()[0])
+        self.assertIn("user", response.json()[0])
+        self.assertIn("username", response.json()[0])
+        self.assertIn("first_name", response.json()[0])
+        self.assertIn("last_name", response.json()[0])
+        self.assertIn("file", response.json()[0])
+        self.assertIn("type", response.json()[0])
 
     def test_profile_get_business_list_401(self):
         url = reverse("profile-customer-list")
