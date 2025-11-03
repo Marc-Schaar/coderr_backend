@@ -45,7 +45,9 @@ class OrdersListView(generics.ListCreateAPIView):
             offer_detail_id = int(offer_detail_id)
         except (TypeError, ValueError):
             raise ValidationError(
-                {"offer_detail_id": "offer_detail_id muss eine Zahl sein und darf nicht fehlen."}
+                {
+                    "offer_detail_id": "offer_detail_id muss eine Zahl sein und darf nicht fehlen."
+                }
             )
 
         try:
