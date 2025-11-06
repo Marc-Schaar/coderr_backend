@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-v0+q-v(0!whpc=ip0yzy1d29zl-4$uvf-n#w8jh)c5u-^!swk1
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'marc-schaar.developerakademie.org
+    'marc-schaar.developerakademie.org'
 ]
 
 
