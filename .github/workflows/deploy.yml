@@ -1,0 +1,49 @@
+name: Deploy
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  test:
+    uses: ./.github/workflows/tests.yml
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          envs: DEPLOY_PATH,SUPERVISOR_SERVICE
+          script_stop: true
+          script: |
+            set -e
+            cd "$DEPLOY_PATH"
+
+            echo "Fetching latest changes..."
+            git fetch --all
+            git pull --ff-only origin master
+
+            echo "Installing dependencies..."
+            source env/bin/activate
+            pip install --no-cache-dir -r requirements.txt
+
+            echo "Applying database migrations..."
+            python manage.py migrate --noinput
+
+            echo "Collecting static files..."
+            python manage.py collectstatic --noinput
+
+            echo "Restarting application..."
+            supervisorctl restart "$SUPERVISOR_SERVICE"
+        env:
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          SUPERVISOR_SERVICE: ${{ secrets.SUPERVISOR_SERVICE }}
