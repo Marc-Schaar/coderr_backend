@@ -43,7 +43,7 @@ This project was built as part of the [Developer Akademie](https://developerakad
 - **Django REST Framework**
 - **django-filter** for filtering/searching
 - **python-dotenv** for loading configuration from a `.env` file
-- **SQLite** (default, file-based database)
+- **SQLite** for local development, **PostgreSQL** in production (switches automatically based on `DEBUG`)
 - **GitHub Actions** for CI/CD
 - Deployed on a webspace with **supervisord** managing the app process
 
@@ -122,6 +122,11 @@ Settings that differ between local development and production (secret key, debug
 | `SECRET_KEY`   | Django's cryptographic signing key                        | insecure placeholder    | a long random string (see below) |
 | `DEBUG`        | Enables Django's debug mode and detailed error pages       | `True`                  | `False`                      |
 | `ALLOWED_HOSTS`| Comma-separated hostnames the server may respond to        | `127.0.0.1,localhost`   | `coderr.marc-schaar.com`     |
+| `DB_NAME`      | PostgreSQL database name *(only used when `DEBUG=False`)*  | —                       | `coderr`                     |
+| `DB_USER`      | PostgreSQL user *(only used when `DEBUG=False`)*           | —                       | `coderr`                     |
+| `DB_PASSWORD`  | PostgreSQL password *(only used when `DEBUG=False`)*       | —                       | *(secret)*                   |
+| `DB_HOST`      | PostgreSQL host *(only used when `DEBUG=False`)*           | —                       | `localhost`                  |
+| `DB_PORT`      | PostgreSQL port *(only used when `DEBUG=False`)*           | —                       | `5432`                       |
 
 Generate a real production secret key with:
 
@@ -130,6 +135,15 @@ python -c "from django.core.management.utils import get_random_secret_key; print
 ```
 
 If no `.env` file exists (or a variable is missing from it), the app falls back to the local-development defaults above, so a fresh clone still runs out of the box.
+
+### Database: SQLite vs. PostgreSQL
+
+The database is selected automatically based on `DEBUG` — no separate switch to remember:
+
+- **`DEBUG=True`** (local development): always uses a local SQLite file (`db.sqlite3`), zero setup required.
+- **`DEBUG=False`** (production): always uses PostgreSQL, configured via the `DB_*` variables above. The `psycopg2-binary` driver is already included in `requirements.txt`.
+
+This means the production database must exist and be reachable *before* migrations run — see [Deployment](#deployment).
 
 ## Running Tests
 
@@ -191,9 +205,11 @@ Deployment targets a Linux server managed with **supervisord** (e.g. an Uberspac
 ### One-time server setup
 
 1. Clone this repository on the server and set up a virtual environment named `env` inside it (same layout as the [local setup](#getting-started-local-setup)).
-2. Create a `.env` file in the repository root on the server (copy from `.env.example`) with **production** values — at minimum `DEBUG=False`, a freshly generated `SECRET_KEY`, and `ALLOWED_HOSTS=coderr.marc-schaar.com`. This file is created once by hand and is never touched by the deploy workflow.
-3. Configure a `supervisord` program that runs the app (e.g. via `gunicorn`) and can be restarted with `supervisorctl restart <service-name>`.
-4. Generate a dedicated SSH keypair for deployments and add the **public** key to the server user's `~/.ssh/authorized_keys`.
+2. Provision a PostgreSQL database and user for the app (e.g. `createdb coderr` / `createuser coderr` on Uberspace, or via your provider's dashboard).
+3. Create a `.env` file in the repository root on the server (copy from `.env.example`) with **production** values — at minimum `DEBUG=False`, a freshly generated `SECRET_KEY`, `ALLOWED_HOSTS=coderr.marc-schaar.com`, and the `DB_*` credentials for the database from step 2. This file is created once by hand and is never touched by the deploy workflow.
+4. Run `python manage.py migrate` once by hand on the server to create the schema on the fresh PostgreSQL database (subsequent migrations run automatically on every deploy).
+5. Configure a `supervisord` program that runs the app (e.g. via `gunicorn`) and can be restarted with `supervisorctl restart <service-name>`.
+6. Generate a dedicated SSH keypair for deployments and add the **public** key to the server user's `~/.ssh/authorized_keys`.
 
 ### One-time GitHub setup
 
