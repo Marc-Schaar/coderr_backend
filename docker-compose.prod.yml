@@ -5,6 +5,11 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+    # PostgreSQL runs directly on the host, not in a container. From inside
+    # the bridge network "localhost" means the container itself, so we need
+    # a name that resolves to the host's IP as seen from Docker.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     # Bound to localhost: the host's reverse proxy (nginx/Apache/Caddy)
     # terminates TLS and forwards to this port. Not exposed publicly.
     # Host port 8002 (not 8000) - that port is already used by another
