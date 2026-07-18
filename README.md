@@ -184,12 +184,10 @@ The project is fully automated with two GitHub Actions workflows in [`.github/wo
 
 ### `tests.yml` — Continuous Integration
 
-Runs on every push and on every pull request targeting `master`:
+Runs on every push and on every pull request targeting `master`, with two jobs:
 
-1. Checks out the code
-2. Sets up Python 3.12
-3. Installs dependencies from `requirements.txt`
-4. Runs `python manage.py test`
+- **`test`**: checks out the code, sets up Python 3.12, installs dependencies from `requirements.txt`, runs `python manage.py test`.
+- **`docker-build`**: builds the `Dockerfile` image and runs it as a smoke test (fallback SQLite settings, no `.env` needed) to confirm gunicorn and WhiteNoise actually come up inside the container. This is the only place the image gets built and run before it ships to production — there's no local Docker available in this project's dev environment (Windows-on-Mac without virtualization).
 
 ### `deploy.yml` — Continuous Deployment
 
@@ -216,7 +214,7 @@ The app itself runs in a single container (`Dockerfile`, gunicorn + WhiteNoise f
 3. Provision a PostgreSQL database and user for the app (e.g. `createdb coderr` / `createuser coderr` on Uberspace, or via your provider's dashboard).
 4. Create a `.env` file in the repository root on the server (copy from `.env.example`) with **production** values — at minimum `DEBUG=False`, a freshly generated `SECRET_KEY`, `ALLOWED_HOSTS=coderr.marc-schaar.com`, `CSRF_TRUSTED_ORIGINS=https://coderr.marc-schaar.com`, and the `DB_*` credentials for the database from step 3. This file is created once by hand and is never touched by the deploy workflow — `docker compose` reads it via `env_file`.
 5. Run `docker compose -f docker-compose.prod.yml up -d --build` once by hand to build the image, create the schema (via the entrypoint's `migrate`) and start the container.
-6. Point your reverse proxy at `127.0.0.1:8000` (the port `docker-compose.prod.yml` binds on the host) and configure TLS for `coderr.marc-schaar.com`.
+6. Point your reverse proxy at `127.0.0.1:8002` (the port `docker-compose.prod.yml` binds on the host - `8000` was already taken by another app on this server) and configure TLS for `coderr.marc-schaar.com`.
 7. Generate a dedicated SSH keypair for deployments and add the **public** key to the server user's `~/.ssh/authorized_keys`. The deploy user needs permission to run `docker`/`docker compose` (e.g. membership in the `docker` group).
 
 ### One-time GitHub setup

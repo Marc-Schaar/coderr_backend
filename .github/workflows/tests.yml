@@ -28,3 +28,37 @@ jobs:
 
       - name: Run Django test suite
         run: python manage.py test
+
+  docker-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t coderr-backend:ci .
+
+      - name: Smoke test container
+        run: |
+          # No .env in a fresh checkout, so this runs with fallback
+          # settings: DEBUG=True, SQLite. Enough to prove gunicorn +
+          # WhiteNoise actually come up inside the built image.
+          docker run -d --name coderr-smoke -p 8000:8000 coderr-backend:ci
+          for i in $(seq 1 15); do
+            if curl -sf http://localhost:8000/admin/login/ -o /dev/null; then
+              echo "Container is up and serving requests"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Container did not become healthy in time"
+          exit 1
+
+      - name: Show container logs
+        if: always()
+        run: docker logs coderr-smoke
+
+      - name: Clean up
+        if: always()
+        run: docker rm -f coderr-smoke
