@@ -1,0 +1,16 @@
+services:
+  web:
+    build: .
+    image: coderr-backend:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    # Bound to localhost: the host's reverse proxy (nginx/Apache/Caddy)
+    # terminates TLS and forwards to this port. Not exposed publicly.
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - media:/usr/src/app/media
+
+volumes:
+  media:

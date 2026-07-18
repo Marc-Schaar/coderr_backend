@@ -40,6 +40,24 @@ ALLOWED_HOSTS = os.environ.get(
     "ALLOWED_HOSTS", "127.0.0.1,localhost"
 ).split(",")
 
+# Comma-separated list of trusted origins for unsafe (POST/PUT/...) requests,
+# e.g. the Django admin login. Required in production because the app runs
+# behind a reverse proxy that terminates TLS. Example:
+#   CSRF_TRUSTED_ORIGINS=https://coderr.marc-schaar.com
+CSRF_TRUSTED_ORIGINS = [
+    origin
+    for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
+    if origin
+]
+
+if not DEBUG:
+    # The reverse proxy terminates TLS and forwards plain HTTP; this header
+    # tells Django the original request was HTTPS, so request.is_secure()
+    # and CSRF/session cookie security work correctly.
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
 
 # Application definition
 
@@ -61,6 +79,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -151,6 +170,22 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+# User-uploaded files (offer images, profile files). Served by Django itself
+# in both dev and production (see core/urls.py) since there is no separate
+# media host; mount a persistent volume over MEDIA_ROOT in production so
+# uploads survive container restarts/redeploys.
+MEDIA_URL = "media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

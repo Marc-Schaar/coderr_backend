@@ -45,7 +45,7 @@ This project was built as part of the [Developer Akademie](https://developerakad
 - **python-dotenv** for loading configuration from a `.env` file
 - **SQLite** for local development, **PostgreSQL** in production (switches automatically based on `DEBUG`)
 - **GitHub Actions** for CI/CD
-- Deployed on a webspace with **supervisord** managing the app process
+- **gunicorn** + **WhiteNoise** serving the app, packaged with **Docker**, deployed via `docker compose`
 
 ## Getting Started (Local Setup)
 
@@ -104,12 +104,17 @@ python manage.py runserver
 The API is now available at `http://127.0.0.1:8000/api/`.
 
 > **Alternative: Docker**
-> A `Dockerfile` is included for running the app in a container:
+> The `Dockerfile` builds a production-style image (gunicorn + WhiteNoise). For local development you can still run Django's dev server inside it by mounting the source and overriding the command:
 > ```bash
 > docker build -t coderr .
 > docker run -it -v "$(pwd):/usr/src/app" -w /usr/src/app -p 8000:8000 coderr python manage.py runserver 0.0.0.0:8000
 > ```
 > (see [`run_django.sh`](run_django.sh) for the same command as a script)
+>
+> For a production-like run instead (gunicorn, `DEBUG=False`, needs a reachable PostgreSQL via the `DB_*` variables in your `.env`):
+> ```bash
+> docker compose -f docker-compose.prod.yml up --build
+> ```
 
 ## Configuration (Environment Variables)
 
@@ -127,6 +132,8 @@ Settings that differ between local development and production (secret key, debug
 | `DB_PASSWORD`  | PostgreSQL password *(only used when `DEBUG=False`)*       | —                       | *(secret)*                   |
 | `DB_HOST`      | PostgreSQL host *(only used when `DEBUG=False`)*           | —                       | `localhost`                  |
 | `DB_PORT`      | PostgreSQL port *(only used when `DEBUG=False`)*           | —                       | `5432`                       |
+| `CSRF_TRUSTED_ORIGINS` | Comma-separated origins trusted for unsafe requests (e.g. admin login) *(only needed when `DEBUG=False`, behind a reverse proxy)* | — | `https://coderr.marc-schaar.com` |
+| `GUNICORN_WORKERS` | Number of gunicorn worker processes *(Docker/production only)* | — | `3` |
 
 Generate a real production secret key with:
 
@@ -191,25 +198,26 @@ Runs on every push to `master` (and can also be triggered manually via *Actions 
 1. Calls `tests.yml` and **only continues if all tests pass**
 2. Connects to the production server over SSH
 3. Pulls the latest `master` branch (`git pull --ff-only`, so it never overwrites diverging local changes)
-4. Installs/updates dependencies inside the server's virtual environment
-5. Applies pending database migrations
-6. Collects static files
-7. Restarts the application process via `supervisorctl`
+4. Rebuilds and restarts the app container with `docker compose -f docker-compose.prod.yml up -d --build` — this also applies pending migrations (runs on container start, see `entrypoint.sh`) and refreshes static files (collected during the image build)
+5. Prunes dangling images left over from the previous build
 
 This means: **merging to `master` automatically ships to production, but only if the tests are green.**
 
 ## Deployment
 
-Deployment targets a Linux server managed with **supervisord** (e.g. an Uberspace instance), reachable over SSH. GitHub Actions connects with a dedicated deploy key — no manual server access is needed for day-to-day deploys.
+Deployment targets a Linux server (e.g. an Uberspace or any VPS) with **Docker** and the **Compose plugin** installed, reachable over SSH, behind a reverse proxy (nginx/Apache/Caddy) that terminates TLS and forwards to the container. GitHub Actions connects with a dedicated deploy key — no manual server access is needed for day-to-day deploys.
+
+The app itself runs in a single container (`Dockerfile`, gunicorn + WhiteNoise for static files); PostgreSQL is **not** containerized — it's expected to already be reachable from the server (e.g. a managed database, or Postgres installed directly on the host).
 
 ### One-time server setup
 
-1. Clone this repository on the server and set up a virtual environment named `env` inside it (same layout as the [local setup](#getting-started-local-setup)).
-2. Provision a PostgreSQL database and user for the app (e.g. `createdb coderr` / `createuser coderr` on Uberspace, or via your provider's dashboard).
-3. Create a `.env` file in the repository root on the server (copy from `.env.example`) with **production** values — at minimum `DEBUG=False`, a freshly generated `SECRET_KEY`, `ALLOWED_HOSTS=coderr.marc-schaar.com`, and the `DB_*` credentials for the database from step 2. This file is created once by hand and is never touched by the deploy workflow.
-4. Run `python manage.py migrate` once by hand on the server to create the schema on the fresh PostgreSQL database (subsequent migrations run automatically on every deploy).
-5. Configure a `supervisord` program that runs the app (e.g. via `gunicorn`) and can be restarted with `supervisorctl restart <service-name>`.
-6. Generate a dedicated SSH keypair for deployments and add the **public** key to the server user's `~/.ssh/authorized_keys`.
+1. Install Docker and the Docker Compose plugin on the server.
+2. Clone this repository on the server.
+3. Provision a PostgreSQL database and user for the app (e.g. `createdb coderr` / `createuser coderr` on Uberspace, or via your provider's dashboard).
+4. Create a `.env` file in the repository root on the server (copy from `.env.example`) with **production** values — at minimum `DEBUG=False`, a freshly generated `SECRET_KEY`, `ALLOWED_HOSTS=coderr.marc-schaar.com`, `CSRF_TRUSTED_ORIGINS=https://coderr.marc-schaar.com`, and the `DB_*` credentials for the database from step 3. This file is created once by hand and is never touched by the deploy workflow — `docker compose` reads it via `env_file`.
+5. Run `docker compose -f docker-compose.prod.yml up -d --build` once by hand to build the image, create the schema (via the entrypoint's `migrate`) and start the container.
+6. Point your reverse proxy at `127.0.0.1:8000` (the port `docker-compose.prod.yml` binds on the host) and configure TLS for `coderr.marc-schaar.com`.
+7. Generate a dedicated SSH keypair for deployments and add the **public** key to the server user's `~/.ssh/authorized_keys`. The deploy user needs permission to run `docker`/`docker compose` (e.g. membership in the `docker` group).
 
 ### One-time GitHub setup
 
@@ -222,7 +230,6 @@ Add the following as **Repository Secrets** (*Settings → Secrets and variables
 | `SSH_PORT`           | SSH port (optional, defaults to `22`)                               |
 | `SSH_PRIVATE_KEY`    | Private key of the dedicated deploy keypair (never the personal key)|
 | `DEPLOY_PATH`        | Absolute path to the cloned repository on the server                |
-| `SUPERVISOR_SERVICE` | Name of the `supervisord` program to restart after deploying        |
 
 Once these secrets are set, every push to `master` deploys automatically.
 
@@ -238,7 +245,9 @@ coderr_backend/
 ├── app_platform/       # Platform-wide info endpoints
 ├── .github/workflows/  # CI (tests.yml) and CD (deploy.yml) pipelines
 ├── .env.example         # Documented template for environment variables
-├── Dockerfile           # Container image for local/dev use
+├── Dockerfile           # Production container image (gunicorn + WhiteNoise)
+├── docker-compose.prod.yml # Compose file used by the deploy pipeline
+├── entrypoint.sh        # Container startup: migrate, then run gunicorn
 └── requirements.txt     # Python dependencies
 ```
 
