@@ -5,17 +5,16 @@ services:
     restart: unless-stopped
     env_file:
       - .env
-    # PostgreSQL runs directly on the host, not in a container. From inside
-    # the bridge network "localhost" means the container itself, so we need
-    # a name that resolves to the host's IP as seen from Docker.
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    # Bound to localhost: the host's reverse proxy (nginx/Apache/Caddy)
-    # terminates TLS and forwards to this port. Not exposed publicly.
-    # Host port 8002 (not 8000) - that port is already used by another
-    # app/container on this server.
-    ports:
-      - "127.0.0.1:8002:8000"
+    # PostgreSQL runs directly on the host, not in a container. Host
+    # networking lets the container reach it via "localhost" like any other
+    # process on the host, instead of juggling Docker bridge IPs/pg_hba
+    # rules. Trade-off: no port isolation from Docker's side, so gunicorn
+    # must bind to 127.0.0.1 itself (see GUNICORN_BIND below) to stay off
+    # the public interface - the host's reverse proxy is what terminates
+    # TLS and forwards to it.
+    network_mode: host
+    environment:
+      - GUNICORN_BIND=127.0.0.1:8002
     volumes:
       - media:/usr/src/app/media
 
