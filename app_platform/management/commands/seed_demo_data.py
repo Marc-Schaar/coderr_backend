@@ -110,6 +110,153 @@ BUSINESS_USERS = [
             },
         ],
     },
+    {
+        "username": "designstudio_elena",
+        "first_name": "Elena",
+        "last_name": "Rossi",
+        "email": "elena.rossi@designstudio.example",
+        "location": "Mailand, Italien",
+        "description": "Brand- und Verpackungsdesignerin mit einem Auge für minimalistische, italienische Ästhetik.",
+        "working_hours": "Mo-Fr 9-18 Uhr",
+        "offers": [
+            {
+                "title": "Corporate-Design-Paket",
+                "description": "Vollständiges Markenpaket bestehend aus Logo, Farbwelt, Typografie und Geschäftsausstattung.",
+                "details": [
+                    ("Basic", 2, 6, 180, ["Logo-Redesign", "Farbpalette", "1 Revision"]),
+                    ("Standard", 4, 8, 380, ["Logo-Redesign", "Farbpalette", "Typografie-Guide", "3 Revisionen"]),
+                    ("Premium", 6, 12, 650, ["Komplettes Brand-Book", "Geschäftsausstattung", "Unbegrenzte Revisionen"]),
+                ],
+            },
+            {
+                "title": "Verpackungsdesign",
+                "description": "Individuelles Verpackungsdesign für Food- und Beauty-Produkte.",
+                "details": [
+                    ("Basic", 1, 5, 120, ["1 Verpackungsdesign", "1 Revision"]),
+                    ("Standard", 3, 7, 280, ["3 Verpackungsvarianten", "Drucklayout", "2 Revisionen"]),
+                    ("Premium", 5, 10, 500, ["5 Verpackungsvarianten", "Drucklayout", "Mockups", "Unbegrenzte Revisionen"]),
+                ],
+            },
+        ],
+    },
+    {
+        "username": "devstudio_carlos",
+        "first_name": "Carlos",
+        "last_name": "Mendes",
+        "email": "carlos.mendes@devstudio.example",
+        "location": "Lissabon, Portugal",
+        "description": "Backend-Entwickler mit Schwerpunkt auf E-Commerce-Plattformen und Zahlungsanbindungen.",
+        "working_hours": "Mo-Fr 8-16 Uhr",
+        "offers": [
+            {
+                "title": "Onlineshop-Einrichtung",
+                "description": "Einrichtung eines individuellen Onlineshops inklusive Zahlungsanbindung und Produktimport.",
+                "details": [
+                    ("Basic", 2, 7, 400, ["Bis zu 20 Produkte", "1 Zahlungsanbieter", "2 Revisionen"]),
+                    ("Standard", 4, 12, 900, ["Bis zu 100 Produkte", "2 Zahlungsanbieter", "Versandkonfiguration"]),
+                    ("Premium", 8, 18, 1800, ["Unbegrenzte Produkte", "Alle Zahlungsanbieter", "Individuelle Erweiterungen"]),
+                ],
+            },
+        ],
+    },
+    {
+        "username": "wordcraft_amara",
+        "first_name": "Amara",
+        "last_name": "Okafor",
+        "email": "amara.okafor@wordcraft.example",
+        "location": "Lagos, Nigeria",
+        "description": "Content-Strategin und Copywriterin für internationale Marken und Startups.",
+        "working_hours": "Di-Sa 10-16 Uhr",
+        "offers": [
+            {
+                "title": "Website-Copywriting",
+                "description": "Überzeugende, konversionsorientierte Texte für Landingpages und Firmenwebsites.",
+                "details": [
+                    ("Basic", 1, 4, 90, ["Bis zu 3 Seiten", "1 Revision"]),
+                    ("Standard", 2, 6, 200, ["Bis zu 6 Seiten", "Tonalitäts-Guide", "2 Revisionen"]),
+                    ("Premium", 4, 8, 380, ["Bis zu 12 Seiten", "A/B-Testing-Varianten", "Unbegrenzte Revisionen"]),
+                ],
+            },
+            {
+                "title": "E-Mail-Newsletter-Reihe",
+                "description": "Aufbau einer mehrteiligen Newsletter-Kampagne inklusive Betreffzeilen-Optimierung.",
+                "details": [
+                    ("Basic", 3, 3, 70, ["3 Newsletter", "1 Revision"]),
+                    ("Standard", 6, 5, 130, ["6 Newsletter", "Betreffzeilen-Varianten", "2 Revisionen"]),
+                    ("Premium", 12, 7, 240, ["12 Newsletter", "Automatisierungs-Setup", "3 Revisionen"]),
+                ],
+            },
+        ],
+    },
+    {
+        "username": "pixelworks_yuki",
+        "first_name": "Yuki",
+        "last_name": "Tanaka",
+        "email": "yuki.tanaka@pixelworks.example",
+        "location": "Tokio, Japan",
+        "description": "Fotografin für Events, Portraits und minimalistische Produktshootings.",
+        "working_hours": "Mi-So 10-19 Uhr",
+        "offers": [
+            {
+                "title": "Event-Fotografie",
+                "description": "Professionelle Begleitung von Firmenevents, Konferenzen und Produktlaunches.",
+                "details": [
+                    ("Basic", 0, 5, 220, ["3 Stunden vor Ort", "50 bearbeitete Fotos"]),
+                    ("Standard", 1, 5, 420, ["6 Stunden vor Ort", "150 bearbeitete Fotos", "1 Revision"]),
+                    ("Premium", 2, 7, 750, ["Ganztägig vor Ort", "Unbegrenzte Fotos", "Highlight-Video"]),
+                ],
+            },
+        ],
+    },
+    {
+        "username": "uxlab_sofia",
+        "first_name": "Sofia",
+        "last_name": "Lindqvist",
+        "email": "sofia.lindqvist@uxlab.example",
+        "location": "Stockholm, Schweden",
+        "description": "UX/UI-Designerin mit Fokus auf skandinavisches, nutzerzentriertes Interfacedesign.",
+        "working_hours": "Mo-Fr 9-17 Uhr",
+        "offers": [
+            {
+                "title": "App-UI/UX-Design",
+                "description": "Nutzerzentriertes Interface-Design für mobile Apps, von Wireframe bis High-Fidelity-Prototyp.",
+                "details": [
+                    ("Basic", 2, 8, 350, ["Wireframes", "5 Screens", "1 Revision"]),
+                    ("Standard", 4, 12, 750, ["High-Fidelity-Design", "12 Screens", "Klickbarer Prototyp"]),
+                    ("Premium", 8, 18, 1400, ["Komplettes Design-System", "Unbegrenzte Screens", "Usability-Test"]),
+                ],
+            },
+            {
+                "title": "Usability-Testing",
+                "description": "Strukturierte Usability-Tests mit echten Nutzern inklusive Auswertungsbericht.",
+                "details": [
+                    ("Basic", 1, 5, 180, ["3 Testpersonen", "Kurzbericht"]),
+                    ("Standard", 2, 7, 350, ["6 Testpersonen", "Ausführlicher Bericht", "Handlungsempfehlungen"]),
+                    ("Premium", 3, 10, 600, ["10 Testpersonen", "Videoaufzeichnungen", "Workshop zur Auswertung"]),
+                ],
+            },
+        ],
+    },
+    {
+        "username": "videoedit_ahmed",
+        "first_name": "Ahmed",
+        "last_name": "El-Sayed",
+        "email": "ahmed.elsayed@videoedit.example",
+        "location": "Kairo, Ägypten",
+        "description": "Video-Editor und Motion-Designer für Social-Media-Content und Werbespots.",
+        "working_hours": "So-Do 11-19 Uhr",
+        "offers": [
+            {
+                "title": "Social-Media-Video-Schnitt",
+                "description": "Dynamischer Videoschnitt für Reels, TikTok und YouTube Shorts inklusive Untertiteln.",
+                "details": [
+                    ("Basic", 3, 3, 60, ["1 Video bis 60 Sek.", "Untertitel", "1 Revision"]),
+                    ("Standard", 5, 4, 150, ["3 Videos bis 60 Sek.", "Untertitel", "Sounddesign"]),
+                    ("Premium", 10, 6, 280, ["5 Videos", "Motion-Graphics-Elemente", "Unbegrenzte Revisionen"]),
+                ],
+            },
+        ],
+    },
 ]
 
 CUSTOMER_USERS = [
@@ -118,6 +265,13 @@ CUSTOMER_USERS = [
     {"username": "kunde_thomas", "first_name": "Thomas", "last_name": "Schulz", "email": "thomas.schulz@example.com"},
     {"username": "kunde_sarah", "first_name": "Sarah", "last_name": "Vogel", "email": "sarah.vogel@example.com"},
     {"username": "kunde_david", "first_name": "David", "last_name": "Krause", "email": "david.krause@example.com"},
+    {"username": "kunde_maria", "first_name": "Maria", "last_name": "Garcia", "email": "maria.garcia@example.com"},
+    {"username": "kunde_liam", "first_name": "Liam", "last_name": "O'Brien", "email": "liam.obrien@example.com"},
+    {"username": "kunde_priya", "first_name": "Priya", "last_name": "Sharma", "email": "priya.sharma@example.com"},
+    {"username": "kunde_wei", "first_name": "Wei", "last_name": "Chen", "email": "wei.chen@example.com"},
+    {"username": "kunde_fatima", "first_name": "Fatima", "last_name": "Al-Sayed", "email": "fatima.alsayed@example.com"},
+    {"username": "kunde_olga", "first_name": "Olga", "last_name": "Ivanova", "email": "olga.ivanova@example.com"},
+    {"username": "kunde_joao", "first_name": "João", "last_name": "Silva", "email": "joao.silva@example.com"},
 ]
 
 REVIEW_TEXTS = [
@@ -129,6 +283,10 @@ REVIEW_TEXTS = [
     "Gute Arbeit, kleine Verzögerung bei der Lieferung.",
     "Absolut zufrieden mit dem Endergebnis.",
     "Hat alle Wünsche berücksichtigt und war sehr geduldig.",
+    "Great communication throughout the whole project, would book again.",
+    "Sehr kreative Lösungen, die genau zu unserer Marke gepasst haben.",
+    "Termintreu und unkompliziert - genau das, was wir gesucht haben.",
+    "Die Qualität hat unsere Erwartungen klar übertroffen, sehr empfehlenswert.",
 ]
 
 DEFAULT_PASSWORD = "Demo1234!"
@@ -255,7 +413,7 @@ class Command(BaseCommand):
             details = list(offer.details.all())
             if not details:
                 continue
-            for customer in random.sample(customer_users, k=min(2, len(customer_users))):
+            for customer in random.sample(customer_users, k=min(4, len(customer_users))):
                 detail = random.choice(details)
                 order, created = Order.objects.get_or_create(
                     customer_user=customer,
@@ -277,7 +435,7 @@ class Command(BaseCommand):
     def _create_reviews(self, business_users, customer_users):
         created_count = 0
         for business_user in business_users:
-            reviewers = random.sample(customer_users, k=min(3, len(customer_users)))
+            reviewers = random.sample(customer_users, k=min(6, len(customer_users)))
             for reviewer in reviewers:
                 _, created = Review.objects.get_or_create(
                     business_user=business_user,
