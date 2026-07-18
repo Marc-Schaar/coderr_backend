@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm -f /tmp/test_migrate_check.sqlite3)",
+      "Bash(DJANGO_SETTINGS_MODULE=core.settings python -c ' *)",
+      "Bash(python manage.py migrate --plan)",
+      "Bash(git check-ignore *)"
+    ]
+  }
+}

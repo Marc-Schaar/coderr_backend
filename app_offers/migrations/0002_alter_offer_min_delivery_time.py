@@ -3,6 +3,18 @@
 from django.db import migrations, models
 
 
+def alter_min_delivery_time_type(apps, schema_editor):
+    # PostgreSQL refuses an implicit interval -> integer cast; SQLite (and
+    # every other backend Django supports here) stores DurationField as a
+    # plain integer already, so there's nothing to convert there.
+    if schema_editor.connection.vendor != "postgresql":
+        return
+    schema_editor.execute(
+        'ALTER TABLE "app_offers_offer" ALTER COLUMN "min_delivery_time" '
+        'TYPE integer USING (COALESCE(EXTRACT(EPOCH FROM "min_delivery_time"), 0) / 86400)::integer'
+    )
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -10,9 +22,18 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name="offer",
-            name="min_delivery_time",
-            field=models.IntegerField(),
+        migrations.SeparateDatabaseAndState(
+            state_operations=[
+                migrations.AlterField(
+                    model_name="offer",
+                    name="min_delivery_time",
+                    field=models.IntegerField(),
+                ),
+            ],
+            database_operations=[
+                migrations.RunPython(
+                    alter_min_delivery_time_type, migrations.RunPython.noop
+                ),
+            ],
         ),
     ]
