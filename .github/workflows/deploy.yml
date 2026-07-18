@@ -23,7 +23,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT || 22 }}
           envs: DEPLOY_PATH
-          script_stop: true
+          sync: true
           script: |
             set -e
             cd "$DEPLOY_PATH"
